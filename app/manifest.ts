@@ -8,6 +8,10 @@ export default function manifest(): MetadataRoute.Manifest {
     description: STORE.tagline,
     start_url: "/",
     display: "standalone",
+    // iOS ignores most of this in Safari, but Capacitor and Android use it.
+    orientation: "any",
+    scope: "/",
+    id: "in.amairastore.app",
     background_color: "#ffffff",
     theme_color: "#000000",
     lang: "en-IN",

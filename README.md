@@ -1,11 +1,49 @@
-# Amaira — Apple Premium Reseller storefront
+# Amaira — Apple Premium Reseller
 
-The website for **Amaira**, an Apple Premium Reseller at
-52, Rishabh Arcade, Sanjaynagar Main Road, Ashwathnagar, Bengaluru 560094 · +91 99003 30022.
+The storefront and back office for **Amaira**, an Apple Premium Reseller at
+52 Rishabh Arcade, Sanjaynagar Main Road, Ashwathnagar, Bengaluru 560094.
+Phone **+91 99003 30022**.
 
-A full storefront: browsable catalogue, configurable products, a bag that survives a
-refresh, a Razorpay checkout that prices every order on the server, plus store, service,
-trade-in, finance, business, education, support and legal pages.
+A customer-facing shop in Apple's design language, plus the operational half a
+real shop needs: stock that cannot be oversold, GST invoices that add up, and a
+portal to run both from.
+
+---
+
+## What is here
+
+**Storefront**
+- 44 products across iPhone, Mac, iPad, Watch, Audio, TV & Home and
+  Accessories — 408 buyable SKUs once finish, capacity and size are combined.
+- Product pages with live stock: sold-out finishes are struck through, short
+  configurations say how many are left, and the buy button reflects reality.
+- Bag that survives a reload, filtered category pages, search, no-cost EMI
+  calculator, trade-in estimator.
+- Store, service, finance, business, education, support and contact pages, plus
+  five legal pages written to be read rather than skipped.
+
+**Checkout**
+- Razorpay — UPI, cards, net banking, wallets and EMI.
+- **Prices are recomputed on the server.** A tampered bag claiming an iPhone
+  costs ₹1 is charged the real ₹1,89,900.
+- Stock is reserved before the payment window opens, so two customers cannot
+  buy the same last unit. The second gets a clear message, not a failed order.
+- GST tax invoice issued automatically on payment, printable to A4.
+
+**Admin portal** (`/admin`)
+- Dashboard: revenue, orders to fulfil, low stock, 14-day chart, best sellers.
+- Inventory: receive stock, run a stock-take, edit price, cost and barcode.
+- Stock-take by camera in the iOS app — point at the box, adjust in two taps.
+- Orders, invoices, customers, enquiries, settings.
+- Every change to stock is written to an append-only ledger, attributed and
+  timestamped.
+
+**Platforms**
+- Phone, tablet and desktop.
+- **Foldable / dual-screen**: columns align to the physical screens using CSS
+  viewport segments, so nothing is ever split by the hinge.
+- Installable PWA with an offline catalog.
+- Capacitor configured for an iOS build — see [APP_STORE.md](./APP_STORE.md).
 
 ---
 
@@ -13,197 +51,139 @@ trade-in, finance, business, education, support and legal pages.
 
 ```bash
 npm install
-cp .env.example .env.local     # then fill in the Razorpay keys — see below
-npm run dev                    # http://localhost:3000
+cp .env.example .env.local     # then fill in the values
+npm run db:seed -- --stock 5   # catalog + 5 units of everything, to look around
+npm run db:admin -- you@example.com "a long passphrase" "Your Name" owner
+npm run dev
 ```
 
-Production:
+Then `http://localhost:3000`, and `http://localhost:3000/admin`.
 
-```bash
-npm run build
-npm start
-```
+Without Razorpay keys the shop browses normally and checkout says payment is
+not switched on yet, rather than breaking.
 
-| Script | What it does |
-| --- | --- |
+| Script | Does |
+|---|---|
 | `npm run dev` | Development server |
-| `npm run build` / `npm start` | Production build and server |
-| `npm run typecheck` | TypeScript, no emit |
-| `npm run icons` | Re-rasterises `public/icon.svg` into the PNG icon sizes |
-| `npm run linkcheck` | Crawls every internal link; reports 404s, missing `<h1>`s, unlabelled controls |
-| `npm run shots` | Renders pages to `./screenshots` for a visual review |
-| `npm run mock:razorpay` | A stand-in payment gateway, for testing checkout without live keys |
-
-The last three need `playwright` (a dev dependency) and a Chromium. Set `CHROMIUM_PATH`
-if yours is not where Playwright installs it.
+| `npm run build` / `start` | Production build and serve |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run db:seed` | Create schema, seed catalog. `-- --stock N` for opening stock |
+| `npm run db:admin` | Create an admin user |
+| `npm run db:stock` | Receive stock against a SKU from the CLI |
+| `npm run icons` | Rasterise `public/icon.svg` into PNG app icons |
 
 ---
 
-## Payments
+## How it is put together
 
-Checkout uses **Razorpay** — UPI, cards, net banking, wallets and EMI, which is what
-customers in India actually reach for.
-
-### Switching it on
-
-1. Create an account at [dashboard.razorpay.com](https://dashboard.razorpay.com) and
-   complete KYC.
-2. **Settings → API Keys** — generate a key pair. Test keys start `rzp_test_`, live keys
-   `rzp_live_`.
-3. Put them in `.env.local` (and in your host's environment for production):
-
-   ```
-   NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxx
-   RAZORPAY_KEY_ID=rzp_test_xxxxxxxx
-   RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxx
-   RAZORPAY_WEBHOOK_SECRET=whatever-you-set-below
-   ```
-
-4. **Settings → Webhooks** — add `https://your-domain/api/razorpay/webhook`, set a secret,
-   and subscribe to `payment.captured`, `payment.failed`, `order.paid`, `refund.processed`.
-
-Until the keys are set, checkout tells the customer to phone the shop rather than failing
-silently.
-
-### How the money path is secured
-
-- **The server prices every order from the catalogue.** Prices in the request body are
-  read and thrown away. A tampered bag claiming an iPhone costs ₹1 is charged the real
-  ₹1,49,900 — `lib/pricing.ts` recomputes from `data/`, and rejects unknown products,
-  invalid options, silly quantities and made-to-order items.
-- **AppleCare+ is never a client-supplied number** — it is taken from the catalogue or
-  treated as zero.
-- **Signatures are verified twice**: the Checkout response (`/api/razorpay/verify`) and
-  the webhook (`/api/razorpay/webhook`), both with constant-time comparison.
-- **Card details never touch this server.** They are entered inside Razorpay's window.
-
-### Testing checkout without live keys
-
-```bash
-npm run mock:razorpay &                     # stands in for api.razorpay.com
-RAZORPAY_KEY_ID=rzp_test_FAKE \
-RAZORPAY_KEY_SECRET=fakesecret \
-RAZORPAY_WEBHOOK_SECRET=hooksecret \
-RAZORPAY_API_BASE=http://127.0.0.1:4545/v1 \
-npm start
-```
-
-`RAZORPAY_API_BASE` exists only for this. Leave it unset everywhere real.
-
----
-
-## ⚠️ Before you take real money
-
-Three things are deliberately unfinished, because each needs a decision only you can make.
-
-### 1. Orders are stored in memory and will be lost
-
-`lib/orders.ts` keeps orders in a `Map`. That is fine in development and on a single
-always-on server; it loses every order on restart, and on a serverless host it loses them
-between requests. **Replace those four functions with a database** — Postgres, Supabase,
-Firestore, anything durable — before launch. Nothing else needs to change; every call site
-goes through that one interface.
-
-### 2. Nothing is emailed
-
-`app/api/enquiry/route.ts` validates contact-form submissions and writes them to the
-server log. No one at the shop will see them until you wire a transport (Resend, SES,
-Postmark, or a webhook into whatever you already use). The same applies to order
-confirmations in the webhook route.
-
-### 3. Catalogue prices and specs need checking against your price list
-
-Every product file in `data/products/` carries a `VERIFY` note at the top. The models,
-prices, storage tiers and specifications were set from the line-up current at build time
-and **must be reconciled with your live APR price list** before go-live. They are all in
-one place so this is an afternoon's work, not an archaeology project.
-
-Also worth a look:
-
-- `data/store.ts` — hours, phone, email and the map pin. The coordinates are approximate;
-  replace them with the exact pin from your Google Business Profile.
-- `data/tradein.ts` — trade-in values. Indicative, and they move fast. Review monthly.
-- `.env.example` → `STORE_GSTIN` — your GSTIN, for invoices.
-
----
-
-## Product imagery
-
-Every product picture on this site is **drawn in code**, not photographed —
-`components/DeviceArt.tsx` renders each device as an SVG from its finish colour. That
-means one file to restyle, perfect sharpness at any size, a few KB instead of a few
-hundred, and no dependency on imagery we are not licensed to use.
-
-If you later get official product photography through the Apple Premium Reseller channel,
-swap the `<DeviceArt>` call sites for `<Image>`. The props already carry everything a
-filename would need. The footer and Terms of Sale both state plainly that the images are
-illustrations.
-
----
-
-## Layout
+Next.js 15 App Router · TypeScript · SQLite · hand-written CSS · Razorpay.
 
 ```
-app/
-  page.tsx                     Home
-  shop/[category]/             Category listing (filters, sort)
-  shop/[category]/[slug]/      Product detail — configure, EMI, add to bag
-  bag/  checkout/  order/[receiptId]/
-  store/ services/ trade-in/ finance/ business/ education/ support/ contact/ about/
-  legal/{privacy,terms,returns,shipping,warranty}/
-  api/razorpay/{order,verify,webhook}/    Payment endpoints
-  api/enquiry/                            Contact-form intake
-  sitemap.ts  robots.ts  manifest.ts
-
-components/
-  DeviceArt.tsx                Parametric SVG product renders
-  SiteHeader.tsx               Nav, mega menu, search, mobile drawer
-  ProductDetail.tsx            Buy box — colour, storage, AppleCare+, EMI
-  CategoryListing.tsx          Client-side filtering and sort
-  CheckoutForm.tsx             Checkout + Razorpay handoff
-
-data/
-  products/*.ts                The catalogue — edit prices here
-  categories.ts  palettes.ts  store.ts  tradein.ts
-
+app/                  routes — storefront, /admin, /api
+  admin/(portal)/     the back office, behind a session
+  api/razorpay/       order · verify · webhook
+components/           UI, including DeviceArt (all product imagery)
+data/                 the catalog — editorial, in Git
+  products/*.ts       one file per family
 lib/
-  pricing.ts                   Server-side repricing. The security boundary.
-  razorpay.ts                  Gateway calls and signature verification
-  orders.ts                    Order store (see the warning above)
-  cart.tsx  money.ts  seo.ts  nav.ts  format.ts  color.ts  types.ts
-
-styles/
-  tokens.css                   Colour, type, spacing, motion
-  base.css  ui.css  layout.css  pages.css
+  db/                 schema, migrations, repositories
+  pricing.ts          server-side repricing — the security boundary
+  native.ts           camera, push, haptics, share; degrades on the web
+styles/               tokens → base → ui → layout → pages → foldable
 ```
 
-### Design system
+### Two deliberate decisions worth knowing
 
-`styles/tokens.css` is the single source of truth. Change a token there and it propagates
-everywhere: the palette is near-black text on paper-white and mist-grey, with one
-saturated blue for action and nothing else competing for attention. Type tightens its
-tracking as it grows, the way Apple's does. Real SF Pro is used on Apple hardware; Inter
-carries everything else.
+**1. Product imagery is drawn, not photographed.**
+`components/DeviceArt.tsx` renders every product as a parametric SVG from its
+finish colour. One file to restyle, crisp at any size, a few KB instead of a
+few hundred, and no dependency on Apple's copyrighted press photography. If you
+license official assets through the APR channel, swap the call sites for
+`<Image>` — the props already carry what a filename would.
+
+**2. Editorial content is in Git; operational data is in the database.**
+Names, specs, taglines and finishes live in `data/` and change through a
+reviewed commit. Price, cost, stock and barcode live in SQLite and change in
+the portal, live, because a shop should not need a deploy to mark six iPhones
+as received.
+
+### Why SQLite
+
+One store, a few dozen writes a day. SQLite gives real transactions with no
+network hop per page render, and a backup is a file copy. It needs a persistent
+disk, which rules out Vercel's default runtime — see [DEPLOY.md](./DEPLOY.md).
+Only `lib/db/client.ts` knows what the database is, so Turso or Postgres drops
+in without touching anything above it.
+
+### How stock cannot be oversold
+
+`available = on_hand − reserved`, enforced by CHECK constraints.
+
+Stock moves in two steps, never one. Starting a payment **reserves**; only a
+confirmed payment **commits**, decrementing on-hand and writing a ledger row.
+An abandoned checkout releases its hold after 20 minutes. Both confirmation
+paths — the browser's verify call and Razorpay's webhook — are idempotent,
+because they race each other and both run.
 
 ---
 
-## Deploying
+## Verified
 
-Works on any host that runs Next.js. Vercel is the least effort:
-
-1. Push this repository and import it at [vercel.com/new](https://vercel.com/new).
-2. Add the environment variables from `.env.example` in the project settings.
-3. Set `NEXT_PUBLIC_SITE_URL` to your real domain — canonical URLs, the sitemap and
-   Open Graph tags all read it.
-4. Point your domain at it, then add the live webhook URL in Razorpay.
-
-Remember the in-memory order store: on Vercel, wire a database **before** going live.
+- Server-side repricing: a client claiming ₹1 is charged ₹1,89,900.
+- Reservation blocks a second buyer of the last unit with a 409 and a
+  plain-words message.
+- Payment commits stock, writes one ledger row and issues one invoice.
+- Replaying verify **and** webhook changes nothing — no double decrement.
+- GST: intra-state splits CGST/SGST, Maharashtra gets IGST, and the tax lines
+  always add back to the amount charged.
+- Expired reservations return their stock.
+- Forged payment and webhook signatures are rejected; genuine ones accepted.
+- 80 internal URLs crawled: no broken links, no JS errors, one `<h1>` per page.
+- Foldable: columns measured at exactly 430px / 430px with the 24px hinge left
+  empty. (Verified by measurement — headless screenshots reset Chromium's
+  display-feature emulation and cannot capture it.)
 
 ---
 
-## Legal note
+## Before you take real money
 
-Amaira is an independent business. Apple, iPhone, iPad, Mac, MacBook, Apple Watch,
-AirPods, HomePod, AppleCare and the Apple logo are trademarks of Apple Inc., registered in
-the U.S. and other countries. This store is not operated by Apple Inc. The site says so in
-the footer and on the About page.
+Four things, in order. All are flagged in the code.
+
+1. **Verify every price and spec** against your live APR price list. The seeded
+   figures are realistic, not authoritative — see the warnings at the top of
+   each `data/products/*.ts`.
+2. **Enter your GSTIN** at `/admin/settings`. Invoices are not valid without it.
+3. **Have your CA check `data/hsn.ts`.** HSN classification is the seller's
+   legal responsibility.
+4. **Set up the Razorpay webhook.** If a customer closes the tab mid-payment
+   it is the only way you learn the money arrived. See [DEPLOY.md](./DEPLOY.md).
+
+Also outstanding, and honest about it:
+- Enquiries are stored and shown in the portal, but **no email is sent**. Wire a
+  transport in `app/api/enquiry/route.ts` if you want them pushed.
+- Order confirmation emails are not implemented. Razorpay emails its own
+  payment receipt; a branded confirmation is not sent.
+- Push notifications are wired client-side only; sending needs an APNs key and
+  a server-side dispatcher.
+- The iOS project has **not** been generated or compiled — that needs macOS and
+  Xcode. See [APP_STORE.md](./APP_STORE.md).
+
+---
+
+## Documentation
+
+- **[DEPLOY.md](./DEPLOY.md)** — Railway, the volume you must attach, the
+  webhook, backups, first-run order.
+- **[APP_STORE.md](./APP_STORE.md)** — why a wrapped website is rejected, what
+  clears Guideline 4.2, why Razorpay is *required* for physical goods, the
+  privacy questionnaire, and the submission checklist.
+
+---
+
+## Legal
+
+Amaira is an independent business. Apple, iPhone, iPad, Mac, MacBook, Apple
+Watch, AirPods, HomePod, AppleCare and the Apple logo are trademarks of Apple
+Inc., registered in the U.S. and other countries. This store is not operated by
+Apple Inc. Use of Apple's marks is governed by your Apple Premium Reseller
+agreement — read it before changing any branding.

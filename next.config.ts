@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // better-sqlite3 is a native module: it must stay outside the bundle.
   serverExternalPackages: ["better-sqlite3"],
+  // Produces .next/standalone with only the files the server needs — the
+  // container image drops from ~1GB to ~200MB.
+  output: "standalone",
   images: {
     formats: ["image/avif", "image/webp"],
   },

@@ -18,6 +18,7 @@ const LINKS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/orders", label: "Orders", badge: "orders" as const },
   { href: "/admin/inventory", label: "Inventory", badge: "low" as const },
+  { href: "/admin/stocktake", label: "Stock-take" },
   { href: "/admin/invoices", label: "Invoices" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/enquiries", label: "Enquiries", badge: "enquiries" as const },

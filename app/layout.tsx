@@ -7,11 +7,14 @@ import "@/styles/base.css";
 import "@/styles/ui.css";
 import "@/styles/layout.css";
 import "@/styles/pages.css";
+import "@/styles/foldable.css";
 
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import ToastHost from "@/components/ToastHost";
 import Reveal from "@/components/Reveal";
+import DevicePosture from "@/components/DevicePosture";
+import ServiceWorker from "@/components/ServiceWorker";
 import { CartProvider } from "@/lib/cart";
 import { buildMenu, buildSearchIndex } from "@/lib/nav";
 import { STORE } from "@/data/store";
@@ -106,6 +109,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SiteFooter />
           <ToastHost />
           <Reveal />
+          <DevicePosture />
+          <ServiceWorker />
         </CartProvider>
       </body>
     </html>
