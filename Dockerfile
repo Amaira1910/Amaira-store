@@ -52,9 +52,14 @@ COPY --from=build /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 COPY --from=build /app/node_modules/bindings ./node_modules/bindings
 COPY --from=build /app/node_modules/file-uri-to-path ./node_modules/file-uri-to-path
 
-# Mount point for the SQLite file. Declared so a missing volume is obvious.
+# Mount point for the SQLite file. The directory is created and owned here so
+# the app can write to it whether or not a volume is mounted over the top.
+#
+# Note: no `VOLUME` instruction. Railway rejects it outright ("docker VOLUME is
+# not supported, use Railway Volumes") because it manages mounts itself, and
+# on other platforms an anonymous volume here would shadow a real bind mount.
+# Attach the volume at /data in your platform instead — see DEPLOY.md.
 RUN mkdir -p /data && chown nextjs:nodejs /data
-VOLUME ["/data"]
 
 USER nextjs
 EXPOSE 3000
