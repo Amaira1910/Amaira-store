@@ -3,6 +3,7 @@ import { changePasswordAction, saveSettingsAction } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin-session";
 import { listAdminUsers } from "@/lib/db/auth";
 import { getSetting } from "@/lib/db/seed";
+import { recentEmails } from "@/lib/email/send";
 import { financialYear } from "@/lib/db/invoices";
 import { INDIAN_STATES } from "@/lib/format";
 import { STORE } from "@/data/store";
@@ -14,6 +15,9 @@ export default async function SettingsPage() {
   const user = await requireAdmin("/admin/settings");
   const isOwner = user.role === "owner";
   const users = listAdminUsers();
+
+  const emails = recentEmails(12);
+  const mailConfigured = Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
 
   const gstin = getSetting("seller_gstin");
   const prefix = getSetting("invoice_prefix", "AMR");
@@ -114,6 +118,53 @@ export default async function SettingsPage() {
           Add staff from the command line:{" "}
           <code>npm run db:admin -- name@amairastore.in &quot;a long passphrase&quot; &quot;Their Name&quot; staff</code>
         </p>
+      </div>
+
+      <div className="adm-card">
+        <p className="adm-card-title">Email</p>
+        {mailConfigured ? (
+          <p className="t-body-sm muted">
+            Sending is switched on. Order confirmations go out the moment a payment is confirmed,
+            and enquiry alerts land in{" "}
+            <strong>{process.env.ENQUIRY_INBOX || STORE.email}</strong>.
+          </p>
+        ) : (
+          <p className="notice notice-amber">
+            <span>
+              <strong>Email is not switched on.</strong> Orders and enquiries are still saved and
+              shown here, so nothing is lost — but customers get no confirmation from you, and you
+              get no alert. Set <code>RESEND_API_KEY</code> and <code>EMAIL_FROM</code> to enable it.
+            </span>
+          </p>
+        )}
+
+        {emails.length > 0 && (
+          <div className="adm-table-wrap" style={{ marginTop: "var(--s-4)" }}>
+            <table className="adm-table">
+              <thead>
+                <tr><th>When</th><th>Kind</th><th>To</th><th>Subject</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                {emails.map((e) => (
+                  <tr key={e.id}>
+                    <td className="tight">{e.created_at}</td>
+                    <td><span className="pill pill-neutral">{e.kind.replace(/_/g, " ")}</span></td>
+                    <td>{e.recipient}</td>
+                    <td>
+                      {e.subject}
+                      {e.error && <span className="adm-sub" style={{ color: "var(--red)" }}>{e.error}</span>}
+                    </td>
+                    <td>
+                      <span className={`pill pill-${e.status === "sent" ? "paid" : e.status === "failed" ? "failed" : "neutral"}`}>
+                        {e.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="adm-card">

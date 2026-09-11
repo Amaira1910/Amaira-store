@@ -5,6 +5,10 @@
    SES, Postmark) if you want them pushed rather than pulled. */
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db/client";
+import { sendEmail } from "@/lib/email/send";
+import { enquiryAlert } from "@/lib/email/templates";
+import { SITE_URL } from "@/lib/seo";
+import { STORE } from "@/data/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -63,12 +67,39 @@ export async function POST(request: Request) {
   if (!PHONE.test(enquiry.phone)) return NextResponse.json({ ok: false, error: "Please give a 10-digit Indian mobile number." }, { status: 400 });
   if (enquiry.message.length < 10) return NextResponse.json({ ok: false, error: "Please add a little more detail." }, { status: 400 });
 
-  getDb()
+  const info = getDb()
     .prepare(
       `INSERT INTO enquiries (kind, name, email, phone, company, subject, message)
        VALUES (@kind, @name, @email, @phone, @company, @subject, @message)`,
     )
     .run(enquiry);
+
+  /* The enquiry is already saved and visible in /admin, so the reply to the
+     customer does not depend on this email landing. Awaited rather than
+     detached only so a misconfigured transport shows up in the server log
+     next to the request that caused it. */
+  const mail = enquiryAlert({
+    id: Number(info.lastInsertRowid),
+    kind: enquiry.kind,
+    name: enquiry.name,
+    email: enquiry.email,
+    phone: enquiry.phone,
+    company: enquiry.company || undefined,
+    subject: enquiry.subject || undefined,
+    message: enquiry.message,
+    siteUrl: SITE_URL,
+  });
+
+  await sendEmail({
+    to: process.env.ENQUIRY_INBOX ?? STORE.email,
+    subject: mail.subject,
+    html: mail.html,
+    text: mail.text,
+    // Replying to the alert answers the customer directly.
+    replyTo: enquiry.email,
+    kind: "enquiry_alert",
+    dedupeKey: `enquiry_alert:${info.lastInsertRowid}`,
+  });
 
   return NextResponse.json({ ok: true });
 }

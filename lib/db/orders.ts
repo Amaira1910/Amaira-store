@@ -11,6 +11,9 @@
 import { getDb, tx } from "./client";
 import { commitReservation, releaseReservation } from "./inventory";
 import { issueInvoiceForOrder } from "./invoices";
+import { sendEmailDetached } from "@/lib/email/send";
+import { orderConfirmation } from "@/lib/email/templates";
+import { SITE_URL } from "@/lib/seo";
 
 export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "cancelled";
 export type FulfilmentStatus = "awaiting" | "packed" | "dispatched" | "delivered" | "collected";
@@ -190,6 +193,26 @@ export function markPaid(receiptId: string, paymentId: string, actor = "system")
   }
 
   const invoice = issueInvoiceForOrder(order.id);
+
+  /* Confirmation email.
+     Detached on purpose: this function is on the payment-confirmation path,
+     and a slow or broken mail provider must not turn a successful payment
+     into an error for the customer. The send is idempotent on its own
+     dedupe key, so the verify call and the webhook racing each other still
+     produce exactly one email. */
+  const full = getOrderByReceipt(receiptId);
+  if (full) {
+    const mail = orderConfirmation({ order: full, invoice, siteUrl: SITE_URL });
+    sendEmailDetached({
+      to: full.contact_email,
+      subject: mail.subject,
+      html: mail.html,
+      text: mail.text,
+      kind: "order_confirmation",
+      dedupeKey: `order_confirmation:${receiptId}`,
+    });
+  }
+
   return { invoiceNo: invoice.invoice_no };
 }
 

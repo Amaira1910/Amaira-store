@@ -239,4 +239,28 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX idx_enquiries_handled ON enquiries(handled, created_at);
     `,
   },
+  {
+    id: 2,
+    name: "email_log",
+    sql: /* sql */ `
+    -- One row per email we have sent, so nothing goes out twice.
+    --
+    -- This matters because markPaid() is reached from BOTH the browser's
+    -- verify call and Razorpay's webhook, and they race. Without this the
+    -- customer gets two confirmations for one order.
+    CREATE TABLE email_log (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind        TEXT NOT NULL,     -- order_confirmation|enquiry_alert|low_stock
+      dedupe_key  TEXT NOT NULL,     -- kind + the thing it is about
+      recipient   TEXT NOT NULL,
+      subject     TEXT NOT NULL,
+      status      TEXT NOT NULL,     -- sent|failed|skipped
+      provider_id TEXT,
+      error       TEXT,
+      created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE (dedupe_key)
+    );
+    CREATE INDEX idx_email_log_kind ON email_log(kind, created_at);
+    `,
+  },
 ];
