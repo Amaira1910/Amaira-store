@@ -32,10 +32,12 @@ RUN npm run build
 # ------------------------------------------------------------- runtime
 FROM base AS runtime
 WORKDIR /app
+# su-exec lets the entrypoint drop from root to the app user after it has
+# fixed the volume's ownership. Alpine's equivalent of gosu, ~20KB.
+RUN apk add --no-cache su-exec
 
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
-    PORT=3000 \
     HOSTNAME=0.0.0.0 \
     DATABASE_PATH=/data/amaira.db
 
@@ -55,19 +57,26 @@ COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
 # earlier; v13 resolves ../prebuilds/<platform>.node directly and does not
 # depend on them at all. The COPY simply failed: "file-uri-to-path: not found".
 
-# Mount point for the SQLite file. The directory is created and owned here so
-# the app can write to it whether or not a volume is mounted over the top.
+# Mount point for the SQLite file.
 #
 # Note: no `VOLUME` instruction. Railway rejects it outright ("docker VOLUME is
 # not supported, use Railway Volumes") because it manages mounts itself, and
 # on other platforms an anonymous volume here would shadow a real bind mount.
 # Attach the volume at /data in your platform instead — see DEPLOY.md.
+#
+# Creating it here only helps when NO volume is mounted. When one is, the mount
+# lands on top owned by root and this chown is irrelevant — which is exactly
+# why the entrypoint re-does it at start-up.
 RUN mkdir -p /data && chown nextjs:nodejs /data
 
-USER nextjs
+COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+# Deliberately NOT `USER nextjs`: the entrypoint needs root to take ownership
+# of the mounted volume, and drops to uid 1001 before exec'ing the server.
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=25s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["node", "server.js"]
