@@ -46,11 +46,14 @@ COPY --from=build /app/public ./public
 COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# The standalone trace does not always pick up a native module's prebuilt
-# binary, so copy better-sqlite3 across whole.
-COPY --from=build /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
-COPY --from=build /app/node_modules/bindings ./node_modules/bindings
-COPY --from=build /app/node_modules/file-uri-to-path ./node_modules/file-uri-to-path
+# No manual copy of better-sqlite3 is needed. Next's output tracing already
+# places it in .next/standalone/node_modules, prebuilds included — and v13
+# ships a self-contained linuxmusl-x64.node, which is the one Alpine loads.
+#
+# Earlier revisions copied it by hand along with `bindings` and
+# `file-uri-to-path`. Those two are dependencies of better-sqlite3 v9 and
+# earlier; v13 resolves ../prebuilds/<platform>.node directly and does not
+# depend on them at all. The COPY simply failed: "file-uri-to-path: not found".
 
 # Mount point for the SQLite file. The directory is created and owned here so
 # the app can write to it whether or not a volume is mounted over the top.
