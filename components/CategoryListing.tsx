@@ -20,6 +20,8 @@ export interface ListingItem {
   mrp?: number;
   art: ArtKind;
   stock: StockState;
+  /** Live available-to-sell across all of this product's SKUs. */
+  available: number;
   colors: { id: string; name: string; hex: string; accent?: string; screen?: string }[];
 }
 
@@ -54,7 +56,7 @@ export default function CategoryListing({ items }: { items: ListingItem[] }) {
   const shown = useMemo(() => {
     let out = items.filter((i) => {
       if (families.length && !families.includes(i.family)) return false;
-      if (inStockOnly && i.stock === "order") return false;
+      if (inStockOnly && i.available <= 0) return false;
       if (bands.length) {
         const ok = bands.some((b) => {
           const band = BANDS.find((x) => x.id === b)!;
@@ -188,7 +190,11 @@ export default function CategoryListing({ items }: { items: ListingItem[] }) {
                   />
                 </div>
                 <p className="tile-eyebrow">
-                  {i.eyebrow ?? (i.stock === "low" ? "Low stock" : i.stock === "order" ? "To order" : "")}
+                  {i.available <= 0
+                    ? "Out of stock"
+                    : i.available <= 3
+                      ? `Only ${i.available} left`
+                      : (i.eyebrow ?? "")}
                 </p>
                 <h3 className="tile-name">
                   <Link href={`/shop/${i.category}/${i.slug}`}>{i.name}</Link>

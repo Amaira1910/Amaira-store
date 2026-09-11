@@ -4,7 +4,8 @@ import DeviceArt from "@/components/DeviceArt";
 import { IconCheck, IconPin, IconTruck } from "@/components/Icons";
 import { getProduct } from "@/data/catalog";
 import { STORE } from "@/data/store";
-import { getOrder } from "@/lib/orders";
+import { getOrderByReceipt } from "@/lib/db/orders";
+import { getInvoiceForOrder } from "@/lib/db/invoices";
 import { gstBreakdown, inr } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,8 @@ type Params = { params: Promise<{ receiptId: string }> };
 
 export default async function OrderPage({ params }: Params) {
   const { receiptId } = await params;
-  const order = await getOrder(receiptId);
+  const order = getOrderByReceipt(receiptId);
+  const invoice = order ? getInvoiceForOrder(order.id) : undefined;
 
   /* An order can be missing if the server restarted — the in-memory store in
      lib/orders.ts is not durable. Say something useful rather than 404. */
@@ -38,7 +40,7 @@ export default async function OrderPage({ params }: Params) {
     );
   }
 
-  const gst = gstBreakdown(order.amount);
+  const gst = gstBreakdown(order.total);
   const paid = order.status === "paid";
 
   return (
@@ -46,7 +48,7 @@ export default async function OrderPage({ params }: Params) {
       <div className="center">
         <span className="confirm-mark"><IconCheck size={32} /></span>
         <h1 className="t-title balance">
-          {paid ? `Thank you, ${order.contact.firstName}.` : "We have your order."}
+          {paid ? `Thank you, ${order.contact_first_name}.` : "We have your order."}
         </h1>
         <p className="t-body-lg muted pretty" style={{ marginTop: "var(--s-3)" }}>
           {paid
@@ -54,8 +56,8 @@ export default async function OrderPage({ params }: Params) {
             : "Your payment is still being confirmed. We will email you the moment it clears."}
         </p>
         <p className="t-body-sm muted" style={{ marginTop: "var(--s-4)" }}>
-          Order reference <strong className="tnum">{order.receiptId}</strong>
-          {order.razorpayPaymentId && <> · Payment <span className="tnum">{order.razorpayPaymentId}</span></>}
+          Order reference <strong className="tnum">{order.receipt_id}</strong>
+          {order.razorpay_payment_id && <> · Payment <span className="tnum">{order.razorpay_payment_id}</span></>}
         </p>
       </div>
 
@@ -65,14 +67,14 @@ export default async function OrderPage({ params }: Params) {
           {order.fulfilment === "pickup" ? (
             <>
               <strong>Collect from {STORE.address.line1}</strong>, {STORE.address.line2}. We will text{" "}
-              {order.contact.phone} when it is ready — usually within two hours. Bring this reference
+              {order.contact_phone} when it is ready — usually within two hours. Bring this reference
               and a photo ID.
             </>
           ) : (
             <>
-              <strong>Delivering to</strong> {order.address?.line1}
-              {order.address?.line2 ? `, ${order.address.line2}` : ""}, {order.address?.city}{" "}
-              {order.address?.pincode}. We will text {order.contact.phone} with tracking.
+              <strong>Delivering to</strong> {order.address_line1}
+              {order.address_line2 ? `, ${order.address_line2}` : ""}, {order.city}{" "}
+              {order.pincode}. We will text {order.contact_phone} with tracking.
             </>
           )}
         </span>
@@ -80,11 +82,11 @@ export default async function OrderPage({ params }: Params) {
 
       <section style={{ marginTop: "var(--s-7)" }}>
         <h2 className="t-headline" style={{ marginBottom: "var(--s-4)" }}>What you ordered</h2>
-        {order.lines.map((l, i) => {
-          const product = getProduct(l.slug);
-          const color = product?.colors.find((c) => c.name === l.colorName) ?? product?.colors[0];
+        {order.items.map((l, i) => {
+          const product = getProduct(l.product_slug);
+          const color = product?.colors.find((c) => l.variant_label?.startsWith(c.name)) ?? product?.colors[0];
           return (
-            <div className="order-mini" key={`${l.slug}-${i}`}>
+            <div className="order-mini" key={`${l.sku_code}-${i}`}>
               <span className="order-mini-art">
                 {product && color && (
                   <DeviceArt kind={product.art} hex={color.hex} accent={color.accent} screen={color.screen} label="" />
@@ -93,26 +95,39 @@ export default async function OrderPage({ params }: Params) {
               <span className="grow">
                 <span className="t-body-sm" style={{ fontWeight: 500, display: "block" }}>{l.name}</span>
                 <span className="t-caption muted">
-                  {[l.colorName, l.storageLabel, l.sizeLabel].filter(Boolean).join(" · ")} · Qty {l.qty}
-                  {l.care ? ` · AppleCare+ ${inr(l.care)}/yr` : ""}
+                  {l.variant_label} · Qty {l.qty}
+                  {l.care_price ? ` · AppleCare+ ${inr(l.care_price)}/yr` : ""}
                   {l.engraving ? ` · Engraved “${l.engraving}”` : ""}
                 </span>
               </span>
-              <span className="t-body-sm tnum nowrap">{inr(l.lineTotal)}</span>
+              <span className="t-body-sm tnum nowrap">{inr(l.line_total)}</span>
             </div>
           );
         })}
 
         <div style={{ marginTop: "var(--s-5)", paddingTop: "var(--s-4)", borderTop: "1px solid var(--hairline)" }}>
-          <div className="summary-row"><span className="muted">Taxable value</span><span className="tnum">{inr(gst.taxableValue)}</span></div>
-          <div className="summary-row"><span className="muted">CGST (9%)</span><span className="tnum">{inr(gst.cgst)}</span></div>
-          <div className="summary-row"><span className="muted">SGST (9%)</span><span className="tnum">{inr(gst.sgst)}</span></div>
+          <div className="summary-row"><span className="muted">Taxable value</span><span className="tnum">{inr(invoice?.taxable_value ?? gst.taxableValue)}</span></div>
+          {invoice && invoice.igst > 0 ? (
+            <div className="summary-row"><span className="muted">IGST (18%)</span><span className="tnum">{inr(invoice.igst)}</span></div>
+          ) : (
+            <>
+              <div className="summary-row"><span className="muted">CGST (9%)</span><span className="tnum">{inr(invoice?.cgst ?? gst.cgst)}</span></div>
+              <div className="summary-row"><span className="muted">SGST (9%)</span><span className="tnum">{inr(invoice?.sgst ?? gst.sgst)}</span></div>
+            </>
+          )}
           <div className="summary-row"><span className="muted">Delivery</span><span className="green">Free</span></div>
-          <div className="summary-total"><span>Paid</span><span className="tnum">{inr(order.amount)}</span></div>
-          {order.gstin && (
-            <p className="t-caption muted" style={{ marginTop: "var(--s-3)" }}>
-              GST invoice will be raised against GSTIN {order.gstin} and emailed to {order.contact.email}.
-            </p>
+          <div className="summary-total"><span>Paid</span><span className="tnum">{inr(order.total)}</span></div>
+
+          {invoice && (
+            <div className="row-wrap" style={{ marginTop: "var(--s-4)", justifyContent: "space-between" }}>
+              <p className="t-caption muted">
+                Tax invoice <strong className="tnum">{invoice.invoice_no}</strong>
+                {order.gstin ? ` · GSTIN ${order.gstin}` : ""}
+              </p>
+              <Link href={`/order/${order.receipt_id}/invoice`} className="btn btn-secondary btn-sm">
+                View tax invoice
+              </Link>
+            </div>
           )}
         </div>
       </section>
@@ -121,7 +136,7 @@ export default async function OrderPage({ params }: Params) {
         <h2 className="t-headline" style={{ marginBottom: "var(--s-3)" }}>What happens next</h2>
         <ol className="stack" style={{ counterReset: "step" }}>
           <li className="t-body-sm muted">
-            <strong style={{ color: "var(--ink)" }}>1.</strong> A confirmation is on its way to {order.contact.email}.
+            <strong style={{ color: "var(--ink)" }}>1.</strong> A confirmation is on its way to {order.contact_email}.
           </li>
           <li className="t-body-sm muted">
             <strong style={{ color: "var(--ink)" }}>2.</strong> We check the serial, update the device and

@@ -7,6 +7,9 @@ import Crumbs from "@/components/Crumbs";
 import { CATEGORIES } from "@/data/categories";
 import { featured, productsIn } from "@/data/catalog";
 
+/* Stock figures are live, so this page renders per request. */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Store — every Apple product we carry",
   description:

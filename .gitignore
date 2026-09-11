@@ -14,3 +14,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /screenshots/
+
+# SQLite database and its WAL sidecars
+/data-store/
+*.db
+*.db-wal
+*.db-shm
+
+# iOS native shell build output
+/ios/App/Pods/
+/ios/App/build/
+/ios/DerivedData/

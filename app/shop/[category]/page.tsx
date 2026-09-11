@@ -7,11 +7,11 @@ import Crumbs from "@/components/Crumbs";
 import LocalNav from "@/components/LocalNav";
 import { CATEGORIES, CATEGORY_BY_SLUG } from "@/data/categories";
 import { familiesIn, fromPrice, productsIn } from "@/data/catalog";
+import { availabilityByProduct } from "@/lib/db/inventory";
 import type { CategorySlug } from "@/lib/types";
 
-export function generateStaticParams() {
-  return CATEGORIES.map((c) => ({ category: c.slug }));
-}
+/* Live stock badges, so this renders per request rather than at build time. */
+export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ category: string }> };
 
@@ -33,6 +33,7 @@ export default async function CategoryPage({ params }: Params) {
   if (!c) notFound();
 
   const products = productsIn(c.slug);
+  const stockByProduct = availabilityByProduct();
   const items: ListingItem[] = products.map((p) => ({
     slug: p.slug,
     category: p.category,
@@ -44,6 +45,7 @@ export default async function CategoryPage({ params }: Params) {
     mrp: p.mrp,
     art: p.art,
     stock: p.stock,
+    available: stockByProduct[p.slug] ?? 0,
     colors: p.colors.map((x) => ({ id: x.id, name: x.name, hex: x.hex, accent: x.accent, screen: x.screen })),
   }));
 

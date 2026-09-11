@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // better-sqlite3 is a native module: it must stay outside the bundle.
+  serverExternalPackages: ["better-sqlite3"],
   images: {
     formats: ["image/avif", "image/webp"],
   },

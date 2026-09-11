@@ -4,10 +4,14 @@
      URL     https://<your-domain>/api/razorpay/webhook
      Events  payment.captured, payment.failed, order.paid, refund.processed
 
-   The signature is computed over the RAW body, so this route must read text()
-   and must not let a framework re-serialise the JSON first. */
+   This is the durable path. If the customer closes the tab mid-payment, the
+   browser never calls /verify and this is the only notification you get — so
+   it must commit stock and issue the invoice exactly as /verify does.
+
+   The signature is computed over the RAW body, so this route reads text() and
+   must not let anything re-serialise the JSON first. */
 import { NextResponse } from "next/server";
-import { getOrderByRazorpayId, updateOrder } from "@/lib/orders";
+import { getOrderByRazorpayId, markFailed, markPaid, markRefunded } from "@/lib/db/orders";
 import { getConfig, verifyWebhookSignature } from "@/lib/razorpay";
 
 export const runtime = "nodejs";
@@ -42,9 +46,9 @@ export async function POST(request: Request) {
   const razorpayOrderId = String(payment?.order_id ?? event.payload?.order?.entity?.id ?? "");
   if (!razorpayOrderId) return NextResponse.json({ ok: true, note: "no order id in event" });
 
-  const order = await getOrderByRazorpayId(razorpayOrderId);
+  const order = getOrderByRazorpayId(razorpayOrderId);
   if (!order) {
-    // Not ours, or lost to a restart. Acknowledge so Razorpay stops retrying.
+    // Not ours. Acknowledge so Razorpay stops retrying.
     console.warn("[razorpay] webhook for unknown order", razorpayOrderId, event.event);
     return NextResponse.json({ ok: true, note: "unknown order" });
   }
@@ -52,26 +56,17 @@ export async function POST(request: Request) {
   switch (event.event) {
     case "payment.captured":
     case "order.paid":
-      await updateOrder(order.receiptId, {
-        status: "paid",
-        razorpayPaymentId: String(payment?.id ?? order.razorpayPaymentId ?? ""),
-        paidAt: order.paidAt ?? new Date().toISOString(),
-      });
+      markPaid(order.receipt_id, String(payment?.id ?? order.razorpay_payment_id ?? ""), "webhook");
       break;
     case "payment.failed":
-      await updateOrder(order.receiptId, {
-        status: "failed",
-        failureReason: String(payment?.error_description ?? "payment_failed"),
-      });
+      markFailed(order.receipt_id, String(payment?.error_description ?? "payment_failed"));
       break;
     case "refund.processed":
-      await updateOrder(order.receiptId, { status: "refunded" });
+      markRefunded(order.receipt_id);
       break;
     default:
       break;
   }
 
-  /* TODO once a durable store is in place: send the confirmation email and
-     push the order into whatever the shop actually runs on. */
   return NextResponse.json({ ok: true });
 }

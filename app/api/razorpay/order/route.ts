@@ -1,21 +1,28 @@
-/* POST /api/razorpay/order — price the bag on the server, then open a
-   Razorpay order for exactly that amount. */
+/* POST /api/razorpay/order
+
+   Prices the bag on the server, reserves the stock, opens a Razorpay order for
+   exactly that amount, and records it. Stock is held from this moment so two
+   customers cannot buy the same last unit; the hold expires if the payment is
+   abandoned. */
 import { NextResponse } from "next/server";
 import { priceBag } from "@/lib/pricing";
-import { createOrder, getConfig, newReceiptId } from "@/lib/razorpay";
-import { saveOrder } from "@/lib/orders";
+import { createOrder } from "@/lib/db/orders";
+import {
+  StockError, releaseExpiredReservations, releaseReservation, reserveStock,
+} from "@/lib/db/inventory";
+import { createOrder as createRazorpayOrder, getConfig, newReceiptId } from "@/lib/razorpay";
 import { toPaise } from "@/lib/money";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const PHONE = /^[6-9]\d{9}$/;          // Indian mobile, 10 digits
+const PHONE = /^[6-9]\d{9}$/;
 const PINCODE = /^[1-9]\d{5}$/;
 const GSTIN = /^\d{2}[A-Z]{5}\d{4}[A-Z]\d[A-Z\d]Z[A-Z\d]$/;
 
-function bad(message: string, status = 400) {
-  return NextResponse.json({ ok: false, error: message }, { status });
+function bad(message: string, status = 400, extra: Record<string, unknown> = {}) {
+  return NextResponse.json({ ok: false, error: message, ...extra }, { status });
 }
 
 function str(v: unknown, max = 120): string {
@@ -52,7 +59,7 @@ export async function POST(request: Request) {
 
   /* --- fulfilment ------------------------------------------------------- */
   const fulfilment = payload.fulfilment === "pickup" ? "pickup" : "delivery";
-  let address: NonNullable<Parameters<typeof saveOrder>[0]["address"]> | undefined;
+  let address: { line1: string; line2: string; city: string; state: string; pincode: string } | undefined;
 
   if (fulfilment === "delivery") {
     const a = (payload.address ?? {}) as Record<string, unknown>;
@@ -70,7 +77,9 @@ export async function POST(request: Request) {
   }
 
   const gstin = str(payload.gstin, 15).toUpperCase();
-  if (gstin && !GSTIN.test(gstin)) return bad("That GSTIN does not look valid. Leave it blank if you do not need a business invoice.");
+  if (gstin && !GSTIN.test(gstin)) {
+    return bad("That GSTIN does not look valid. Leave it blank if you do not need a business invoice.");
+  }
 
   /* --- money: recomputed here, never taken from the client -------------- */
   const priced = priceBag(payload.lines);
@@ -79,8 +88,21 @@ export async function POST(request: Request) {
 
   const receiptId = newReceiptId();
 
+  /* --- stock: held before we ever ask for money ------------------------- */
+  releaseExpiredReservations();
   try {
-    const order = await createOrder(cfg, {
+    reserveStock(receiptId, priced.lines.map((l) => ({ skuCode: l.skuCode, qty: l.qty })));
+  } catch (err) {
+    if (err instanceof StockError) {
+      return bad(err.message, 409, { skuCode: err.skuCode, available: err.available });
+    }
+    console.error("[order] reservation failed", err);
+    return bad("We could not confirm stock for that order. Please try again, or call the store.", 500);
+  }
+
+  /* --- gateway ---------------------------------------------------------- */
+  try {
+    const rzp = await createRazorpayOrder(cfg, {
       amountPaise: toPaise(priced.total),
       receipt: receiptId,
       notes: {
@@ -92,30 +114,45 @@ export async function POST(request: Request) {
       },
     });
 
-    await saveOrder({
+    createOrder({
       receiptId,
-      razorpayOrderId: order.id,
-      status: "created",
-      amount: priced.total,
-      lines: priced.lines,
+      razorpayOrderId: rzp.id,
       contact,
       fulfilment,
       address,
       gstin: gstin || undefined,
-      createdAt: new Date().toISOString(),
+      subtotal: priced.subtotal,
+      shipping: priced.shipping,
+      total: priced.total,
+      items: priced.lines.map((l) => ({
+        skuCode: l.skuCode,
+        skuId: l.skuId,
+        productSlug: l.slug,
+        name: l.name,
+        variantLabel: l.variantLabel,
+        unitPrice: l.unitPrice,
+        carePrice: l.care,
+        qty: l.qty,
+        lineTotal: l.lineTotal,
+        hsn: l.hsn,
+        gstRate: l.gstRate,
+        engraving: l.engraving,
+      })),
     });
 
     return NextResponse.json({
       ok: true,
       receiptId,
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
+      orderId: rzp.id,
+      amount: rzp.amount,
+      currency: rzp.currency,
       keyId: cfg.keyId,
       lines: priced.lines,
       total: priced.total,
     });
   } catch (err) {
+    // The gateway never opened, so give the stock straight back.
+    releaseReservation(receiptId);
     console.error("[razorpay] order creation failed", err);
     return bad("We could not reach the payment gateway. Please try again, or call the store.", 502);
   }

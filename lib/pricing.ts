@@ -2,23 +2,34 @@
    Authoritative pricing.
 
    The browser sends a bag; the server ignores every price in it and recomputes
-   from the catalog. A tampered payload therefore cannot buy an iPhone for ₹1 —
-   it fails validation and the order is refused.
+   from the catalog and the SKU table. A tampered payload therefore cannot buy
+   an iPhone for ₹1 — it fails validation and the order is refused.
+
+   Prices come from the DATABASE when a SKU row exists (so the shop can change
+   a price without a deploy) and fall back to the catalog otherwise.
    ========================================================================== */
 import { getProduct } from "@/data/catalog";
+import { hsnFor } from "@/data/hsn";
+import { getSkuByCode } from "@/lib/db/inventory";
+import { skuCodeFor } from "@/lib/sku";
 import type { CartLine } from "@/lib/types";
 
 export interface PricedLine {
   slug: string;
+  skuCode: string;
+  skuId: number | null;
   name: string;
   colorName: string;
   storageLabel?: string;
   sizeLabel?: string;
+  variantLabel: string;
   engraving?: string;
   qty: number;
   unitPrice: number;
   care: number;
   lineTotal: number;
+  hsn: string;
+  gstRate: number;
 }
 
 export interface PricingResult {
@@ -33,7 +44,6 @@ export interface PricingResult {
 const MAX_QTY_PER_LINE = 10;
 const MAX_LINES = 20;
 
-/** Anything a client could have sent. Validated field by field. */
 type Incoming = Partial<CartLine> & Record<string, unknown>;
 
 export function priceBag(incoming: unknown): PricingResult {
@@ -54,9 +64,6 @@ export function priceBag(incoming: unknown): PricingResult {
 
     const product = getProduct(slug);
     if (!product) return { ...empty, error: `We no longer carry one of the items in your bag (${slug}).` };
-    if (product.stock === "order") {
-      return { ...empty, error: `${product.name} is made to order and cannot be bought online yet. Please call the store.` };
-    }
 
     const qty = Number(raw.qty);
     if (!Number.isInteger(qty) || qty < 1 || qty > MAX_QTY_PER_LINE) {
@@ -66,7 +73,9 @@ export function priceBag(incoming: unknown): PricingResult {
     const color = product.colors.find((c) => c.id === raw.colorId);
     if (!color) return { ...empty, error: `Choose a finish for ${product.name}.` };
 
-    let unitPrice = product.basePrice;
+    let catalogPrice = product.basePrice;
+    let storageLabel: string | undefined;
+    let sizeLabel: string | undefined;
 
     if (product.storage?.length) {
       const option = product.storage.find((s) => s.id === raw.storageId);
@@ -74,14 +83,30 @@ export function priceBag(incoming: unknown): PricingResult {
       if (option.available === false) {
         return { ...empty, error: `${product.name} ${option.label} is not available right now.` };
       }
-      unitPrice += option.priceDelta;
+      catalogPrice += option.priceDelta;
+      storageLabel = option.label;
     }
 
     if (product.sizes?.options.length) {
       const option = product.sizes.options.find((s) => s.id === raw.sizeId);
       if (!option) return { ...empty, error: `Choose ${product.sizes.title.toLowerCase()} for ${product.name}.` };
-      unitPrice += option.priceDelta;
+      catalogPrice += option.priceDelta;
+      sizeLabel = option.label;
     }
+
+    const skuCode = skuCodeFor(
+      slug,
+      color.id,
+      typeof raw.storageId === "string" ? raw.storageId : null,
+      typeof raw.sizeId === "string" ? raw.sizeId : null,
+    );
+
+    // The SKU row is the source of truth for price and for whether it is sellable.
+    const sku = getSkuByCode(skuCode);
+    if (sku && !sku.active) {
+      return { ...empty, error: `${product.name} in ${color.name} is not available right now.` };
+    }
+    const unitPrice = sku?.price ?? catalogPrice;
 
     /* AppleCare+ is either the catalog price or nothing. A client cannot invent a figure. */
     const wantsCare = Number(raw.care) > 0;
@@ -92,17 +117,24 @@ export function priceBag(incoming: unknown): PricingResult {
         ? raw.engraving.trim().slice(0, 20)
         : undefined;
 
+    const { hsn, gstRate } = hsnFor(slug, product.category);
+
     lines.push({
       slug,
+      skuCode,
+      skuId: sku?.id ?? null,
       name: product.name,
       colorName: color.name,
-      storageLabel: product.storage?.find((s) => s.id === raw.storageId)?.label,
-      sizeLabel: product.sizes?.options.find((s) => s.id === raw.sizeId)?.label,
+      storageLabel,
+      sizeLabel,
+      variantLabel: [color.name, storageLabel, sizeLabel].filter(Boolean).join(" · "),
       engraving,
       qty,
       unitPrice,
       care,
       lineTotal: (unitPrice + care) * qty,
+      hsn,
+      gstRate,
     });
   }
 

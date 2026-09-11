@@ -16,6 +16,9 @@ import { fromPrice } from "@/data/catalog";
 import { inr, noCostEmi } from "@/lib/money";
 import { openState } from "@/lib/format";
 
+/* Stock figures are live, so this page renders per request. */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: `${STORE.name} — Apple Premium Reseller in Sanjaynagar, Bengaluru`,
   description:

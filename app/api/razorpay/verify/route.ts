@@ -1,8 +1,10 @@
 /* POST /api/razorpay/verify — confirm the signature Checkout handed back.
+
    This is what lets the browser show a confirmation; the webhook is what makes
-   the record durable. Both run, and neither trusts the other. */
+   the record durable. Both run, both are idempotent, and neither trusts the
+   other. */
 import { NextResponse } from "next/server";
-import { getOrder, updateOrder } from "@/lib/orders";
+import { getOrderByReceipt, markFailed, markPaid } from "@/lib/db/orders";
 import { getConfig, verifyPaymentSignature } from "@/lib/razorpay";
 
 export const runtime = "nodejs";
@@ -30,23 +32,20 @@ export async function POST(request: Request) {
 
   if (!verifyPaymentSignature(cfg, { orderId, paymentId, signature })) {
     console.warn("[razorpay] signature mismatch", { orderId, paymentId, receiptId });
-    await updateOrder(receiptId, { status: "failed", failureReason: "signature_mismatch" });
+    markFailed(receiptId, "signature_mismatch");
     return NextResponse.json(
       { ok: false, error: "We could not verify that payment. If money has left your account, call us and we will sort it out." },
       { status: 400 },
     );
   }
 
-  const order = await getOrder(receiptId);
-  if (!order || order.razorpayOrderId !== orderId) {
+  const order = getOrderByReceipt(receiptId);
+  if (!order || order.razorpay_order_id !== orderId) {
     return NextResponse.json({ ok: false, error: "We cannot find that order." }, { status: 404 });
   }
 
-  const updated = await updateOrder(receiptId, {
-    status: "paid",
-    razorpayPaymentId: paymentId,
-    paidAt: new Date().toISOString(),
-  });
+  // Commits the reserved stock and issues the GST invoice.
+  const result = markPaid(receiptId, paymentId, "checkout");
 
-  return NextResponse.json({ ok: true, receiptId, status: updated?.status ?? "paid" });
+  return NextResponse.json({ ok: true, receiptId, status: "paid", invoiceNo: result?.invoiceNo ?? null });
 }

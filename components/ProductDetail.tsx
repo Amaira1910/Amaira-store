@@ -6,6 +6,7 @@ import DeviceArt from "@/components/DeviceArt";
 import { IconCheck, IconGift, IconPin, IconShield, IconTruck } from "@/components/Icons";
 import { lineKey, useCart } from "@/lib/cart";
 import { inr, noCostEmi, savings } from "@/lib/money";
+import { skuCodeFor } from "@/lib/sku";
 import type { ArtKind, ColorOption, StockState, VariantOption } from "@/lib/types";
 
 export interface ProductDetailProps {
@@ -22,6 +23,8 @@ export interface ProductDetailProps {
   storageTitle?: string;
   sizes?: { title: string; options: VariantOption[] };
   stock: StockState;
+  /** Available-to-sell per SKU code, read live from the inventory table. */
+  availability: Record<string, number>;
   careAnnual?: number;
   deliveryLine: string;
   pickupLine: string;
@@ -45,6 +48,14 @@ export default function ProductDetail(p: ProductDetailProps) {
   const storage = p.storage?.find((s) => s.id === storageId);
   const size = p.sizes?.options.find((s) => s.id === sizeId);
 
+  /* Live stock for the exact combination on screen. */
+  const skuCode = skuCodeFor(p.slug, color.id, storage?.id, size?.id);
+  const available = p.availability[skuCode] ?? 0;
+
+  /** Stock for a hypothetical choice, so an option can be disabled before it is picked. */
+  const availableFor = (colorId: string, storageId?: string, sizeId?: string) =>
+    p.availability[skuCodeFor(p.slug, colorId, storageId, sizeId)] ?? 0;
+
   const unitPrice = p.basePrice + (storage?.priceDelta ?? 0) + (size?.priceDelta ?? 0);
   const saved = savings(p.basePrice, p.mrp);
   const careCost = care ? p.careAnnual ?? 0 : 0;
@@ -55,7 +66,7 @@ export default function ProductDetail(p: ProductDetailProps) {
     [total],
   );
 
-  const orderable = p.stock !== "order";
+  const orderable = available > 0;
 
   function addToBag() {
     add({
@@ -135,19 +146,22 @@ export default function ProductDetail(p: ProductDetailProps) {
             <p className="buybox-section-title">Finish — {color.name}</p>
             <p className="buybox-section-hint">Pick the one you will look at every day.</p>
             <div className="row-wrap" role="group" aria-label="Choose a finish">
-              {p.colors.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  className="swatch-btn"
-                  aria-pressed={c.id === colorId}
-                  aria-label={c.name}
-                  title={c.name}
-                  onClick={() => setColorId(c.id)}
-                >
-                  <span className="swatch" style={{ background: c.hex }} />
-                </button>
-              ))}
+              {p.colors.map((c) => {
+                const stock = availableFor(c.id, storage?.id, size?.id);
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={`swatch-btn${stock === 0 ? " is-out" : ""}`}
+                    aria-pressed={c.id === colorId}
+                    aria-label={stock === 0 ? `${c.name} — out of stock` : c.name}
+                    title={stock === 0 ? `${c.name} — out of stock` : c.name}
+                    onClick={() => setColorId(c.id)}
+                  >
+                    <span className="swatch" style={{ background: c.hex }} />
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -158,22 +172,26 @@ export default function ProductDetail(p: ProductDetailProps) {
             <p className="buybox-section-title">{p.storageTitle ?? "Storage"}</p>
             <p className="buybox-section-hint">How much do you need?</p>
             <div className="opt-grid opt-grid-2" role="group" aria-label={p.storageTitle ?? "Storage"}>
-              {p.storage.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  className="opt"
-                  aria-pressed={s.id === storageId}
-                  disabled={s.available === false}
-                  onClick={() => setStorageId(s.id)}
-                >
-                  <span className="opt-label">{s.label}</span>
-                  <span className="opt-note">
-                    {s.note ? `${s.note} · ` : ""}
-                    {inr(p.basePrice + s.priceDelta + (size?.priceDelta ?? 0))}
-                  </span>
-                </button>
-              ))}
+              {p.storage.map((s) => {
+                const stock = availableFor(color.id, s.id, size?.id);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    className="opt"
+                    aria-pressed={s.id === storageId}
+                    disabled={s.available === false}
+                    onClick={() => setStorageId(s.id)}
+                  >
+                    <span className="opt-label">{s.label}</span>
+                    <span className="opt-note">
+                      {s.note ? `${s.note} · ` : ""}
+                      {inr(p.basePrice + s.priceDelta + (size?.priceDelta ?? 0))}
+                      {stock === 0 ? " · Out of stock" : stock <= 2 ? ` · Only ${stock} left` : ""}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -183,21 +201,25 @@ export default function ProductDetail(p: ProductDetailProps) {
           <div className="buybox-section">
             <p className="buybox-section-title">{p.sizes.title}</p>
             <div className="opt-grid opt-grid-2" role="group" aria-label={p.sizes.title}>
-              {p.sizes.options.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  className="opt"
-                  aria-pressed={s.id === sizeId}
-                  onClick={() => setSizeId(s.id)}
-                >
-                  <span className="opt-label">{s.label}</span>
-                  <span className="opt-note">
-                    {s.note ? `${s.note} · ` : ""}
-                    {inr(p.basePrice + (storage?.priceDelta ?? 0) + s.priceDelta)}
-                  </span>
-                </button>
-              ))}
+              {p.sizes.options.map((s) => {
+                const stock = availableFor(color.id, storage?.id, s.id);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    className="opt"
+                    aria-pressed={s.id === sizeId}
+                    onClick={() => setSizeId(s.id)}
+                  >
+                    <span className="opt-label">{s.label}</span>
+                    <span className="opt-note">
+                      {s.note ? `${s.note} · ` : ""}
+                      {inr(p.basePrice + (storage?.priceDelta ?? 0) + s.priceDelta)}
+                      {stock === 0 ? " · Out of stock" : stock <= 2 ? ` · Only ${stock} left` : ""}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -309,11 +331,17 @@ export default function ProductDetail(p: ProductDetailProps) {
             onClick={addToBag}
             disabled={!orderable}
           >
-            {added ? (<><IconCheck size={18} /> Added to bag</>) : orderable ? "Add to Bag" : "Notify me"}
+            {added ? (<><IconCheck size={18} /> Added to bag</>) : orderable ? "Add to Bag" : "Out of stock"}
           </button>
+          {orderable && available <= 3 && (
+            <p className="t-caption amber center" style={{ marginTop: 10 }}>
+              Only {available} left in this configuration.
+            </p>
+          )}
           {!orderable && (
             <p className="t-caption muted center" style={{ marginTop: 10 }}>
-              This one is made to order. <Link href="/contact">Tell us and we will call you when it lands ›</Link>
+              This combination has sold out.{" "}
+              <Link href="/contact">Tell us and we will call you when the next one lands ›</Link>
             </p>
           )}
         </div>

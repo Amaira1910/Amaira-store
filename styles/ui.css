@@ -393,3 +393,15 @@ select.field-input { padding-top: 20px; appearance: none; background-image: none
   .tile-tagline { font-size: var(--t-caption); }
   .tile-foot { padding-top: var(--s-3); }
 }
+
+/* A finish with no stock left: greyed, but still selectable so the customer
+   can see the price and ask us about it. */
+.swatch-btn.is-out .swatch { opacity: 0.3; }
+.swatch-btn.is-out::after {
+  content: "";
+  position: absolute;
+  width: 26px; height: 1.5px;
+  background: var(--ink-3);
+  transform: rotate(-45deg);
+}
+.swatch-btn { position: relative; }

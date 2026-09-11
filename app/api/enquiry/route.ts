@@ -1,12 +1,10 @@
 /* POST /api/enquiry — contact and business enquiry intake.
 
-   ⚠️  RIGHT NOW THIS ONLY VALIDATES AND LOGS. Nothing is emailed, so nobody at
-   the shop will see it until you wire a transport below. Pick one:
-     · Resend        https://resend.com        (simplest)
-     · AWS SES, Postmark, SendGrid — any will do
-     · Or POST it into a Google Sheet / CRM webhook
-   Send to STORE.email, and reply-to the customer's address. */
+   Enquiries are stored in the database and shown in the admin portal, so
+   nothing is lost. Email delivery is still a TODO: wire a transport (Resend,
+   SES, Postmark) if you want them pushed rather than pulled. */
 import { NextResponse } from "next/server";
+import { getDb } from "@/lib/db/client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,8 +12,6 @@ export const dynamic = "force-dynamic";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE = /^[6-9]\d{9}$/;
 
-/* A crude per-IP throttle. Enough to stop a bored script; swap for Upstash
-   Ratelimit or your host's WAF if this ever gets real abuse. */
 const hits = new Map<string, { n: number; since: number }>();
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_PER_WINDOW = 5;
@@ -60,7 +56,6 @@ export async function POST(request: Request) {
     company: s(body.company, 120),
     subject: s(body.subject, 120),
     message: s(body.message, 4000),
-    receivedAt: new Date().toISOString(),
   };
 
   if (!enquiry.name) return NextResponse.json({ ok: false, error: "Please include your name." }, { status: 400 });
@@ -68,8 +63,12 @@ export async function POST(request: Request) {
   if (!PHONE.test(enquiry.phone)) return NextResponse.json({ ok: false, error: "Please give a 10-digit Indian mobile number." }, { status: 400 });
   if (enquiry.message.length < 10) return NextResponse.json({ ok: false, error: "Please add a little more detail." }, { status: 400 });
 
-  // TODO: replace with a real transport. Until then it lands in the server log.
-  console.info("[enquiry]", JSON.stringify(enquiry));
+  getDb()
+    .prepare(
+      `INSERT INTO enquiries (kind, name, email, phone, company, subject, message)
+       VALUES (@kind, @name, @email, @phone, @company, @subject, @message)`,
+    )
+    .run(enquiry);
 
   return NextResponse.json({ ok: true });
 }

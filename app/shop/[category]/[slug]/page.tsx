@@ -8,16 +8,17 @@ import ProductDetail from "@/components/ProductDetail";
 import ProductTile from "@/components/ProductTile";
 import SectionHead from "@/components/SectionHead";
 import { CATEGORY_BY_SLUG } from "@/data/categories";
-import { PRODUCTS, familiesIn, fromPrice, getProduct, related } from "@/data/catalog";
+import { familiesIn, fromPrice, getProduct, related } from "@/data/catalog";
 import { STORE } from "@/data/store";
-import { deliveryPromise, pickupPromise, stockLabel } from "@/lib/format";
+import { deliveryPromise, pickupPromise } from "@/lib/format";
+import { availabilityForProduct, totalAvailable } from "@/lib/db/inventory";
 import { inr } from "@/lib/money";
 import { absolute, jsonLdScript } from "@/lib/seo";
 import type { CategorySlug } from "@/lib/types";
 
-export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ category: p.category, slug: p.slug }));
-}
+/* Rendered per request: the stock figures and the buy button have to be
+   current. SQLite reads are local and sub-millisecond, so this costs little. */
+export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ category: string; slug: string }> };
 
@@ -45,7 +46,14 @@ export default async function ProductPage({ params }: Params) {
   if (!p || p.category !== category) notFound();
 
   const c = CATEGORY_BY_SLUG[p.category as CategorySlug];
-  const stock = stockLabel(p.stock);
+  const availability = availabilityForProduct(p.slug);
+  const available = totalAvailable(p.slug);
+  const stock =
+    available > 5
+      ? { text: "In stock at Sanjaynagar", className: "badge badge-stock" }
+      : available > 0
+        ? { text: `Only ${available} left at Sanjaynagar`, className: "badge badge-new" }
+        : { text: "Out of stock — call to be notified", className: "badge badge-out" };
   const cross = related(p, 4);
   const families = familiesIn(p.category);
 
@@ -63,7 +71,7 @@ export default async function ProductPage({ params }: Params) {
       highPrice: p.basePrice + (p.storage?.at(-1)?.priceDelta ?? 0) + (p.sizes?.options.at(-1)?.priceDelta ?? 0),
       offerCount: (p.storage?.length ?? 1) * (p.sizes?.options.length ?? 1),
       availability:
-        p.stock === "order" ? "https://schema.org/PreOrder" : "https://schema.org/InStock",
+        available > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       seller: { "@type": "Organization", name: STORE.name, "@id": absolute("/#store") },
       url: absolute(`/shop/${p.category}/${p.slug}`),
     },
@@ -111,6 +119,7 @@ export default async function ProductPage({ params }: Params) {
           storageTitle={p.storageTitle}
           sizes={p.sizes}
           stock={p.stock}
+          availability={availability}
           careAnnual={p.careAnnual}
           deliveryLine={deliveryPromise(p)}
           pickupLine={pickupPromise(p)}
