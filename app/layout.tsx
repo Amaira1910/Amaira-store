@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import Link from "next/link";
 
 import "@/styles/tokens.css";
 import "@/styles/base.css";
@@ -9,14 +8,6 @@ import "@/styles/layout.css";
 import "@/styles/pages.css";
 import "@/styles/foldable.css";
 
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
-import ToastHost from "@/components/ToastHost";
-import Reveal from "@/components/Reveal";
-import DevicePosture from "@/components/DevicePosture";
-import ServiceWorker from "@/components/ServiceWorker";
-import { CartProvider } from "@/lib/cart";
-import { buildMenu, buildSearchIndex } from "@/lib/nav";
 import { STORE } from "@/data/store";
 import { SITE_URL, jsonLdScript, localBusinessJsonLd } from "@/lib/seo";
 
@@ -80,10 +71,15 @@ export const viewport: Viewport = {
    sections only when there is JavaScript around to bring them back. */
 const JS_FLAG = `document.documentElement.classList.add("js")`;
 
+/**
+ * Root layout: the document itself, and nothing else.
+ *
+ * The storefront's chrome lives in app/(shop)/layout.tsx and the back office
+ * has its own in app/admin. Putting the shop header here would wrap the admin
+ * portal in the customer navigation and footer — which is exactly the bug this
+ * split fixes.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const menu = buildMenu();
-  const index = buildSearchIndex();
-
   return (
     <html lang="en-IN" className={inter.variable}>
       <head>
@@ -93,26 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={jsonLdScript(localBusinessJsonLd())}
         />
       </head>
-      <body>
-        <CartProvider>
-          <a className="skip-link" href="#main">Skip to content</a>
-
-          <p className="promo-bar">
-            Free delivery across Bengaluru, and no-cost EMI from 3 to 12 months.{" "}
-            <Link href="/finance">See the plans ›</Link>
-          </p>
-
-          <SiteHeader menu={menu} index={index} />
-
-          <main id="main">{children}</main>
-
-          <SiteFooter />
-          <ToastHost />
-          <Reveal />
-          <DevicePosture />
-          <ServiceWorker />
-        </CartProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
