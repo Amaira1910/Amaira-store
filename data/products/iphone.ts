@@ -1,113 +1,187 @@
 /* ==========================================================================
-   iPhone
-   ⚠️  VERIFY BEFORE GO-LIVE: model names, prices and specs below are set from
-   the line-up and Indian MRPs current at the time of build. Reconcile every
-   figure against your live Apple Premium Reseller price list — this file is
-   the single place to edit them.
+   iPhone — reconciled against apple.com/in on 12 September 2026.
+
+   Line-up as Apple India lists it today: iPhone Duo, iPhone 18 Pro Max,
+   iPhone 18 Pro, iPhone Air, iPhone 17, iPhone 17e, iPhone 16.
+
+   iPhone 17 Pro and iPhone 17 Pro Max were withdrawn when the 18 Pro models
+   launched (9 Sept 2026) and are gone from Apple's store — they are not in
+   this file. iPhone 16e was replaced by iPhone 17e.
+
+   Every basePrice below is the Apple India retail MRP (inclusive of all
+   taxes) read off apple.com/in/shop/buy-iphone. The storage priceDeltas are
+   derived from Apple's own per-SKU MRPs, so basePrice + delta equals the
+   listed price for that capacity.
+
+   ⚠️  Apple India repriced the whole carried-over line-up on 9–10 Sept 2026
+   (iPhone 17 ₹82,900 → ₹99,900, iPhone Air ₹1,19,900 → ₹1,49,900, iPhone 16
+   ₹69,900 → ₹89,900). Reconcile against your own APR price list before
+   go-live — reseller landed cost can differ from Apple retail MRP, and this
+   file is the single place to edit it. Note that seedCatalog() never
+   overwrites a price that is already in the database: change live prices in
+   /admin/inventory, not here.
    ========================================================================== */
 import type { Product } from "@/lib/types";
-import { TITANIUM, ALUMINIUM_BRIGHT } from "../palettes";
+import { PRO_18_FINISHES, DUO_FINISHES, E_FINISHES, ALUMINIUM_BRIGHT } from "../palettes";
 
 export const IPHONES: Product[] = [
   {
-    slug: "iphone-17-pro-max",
-    name: "iPhone 17 Pro Max",
-    family: "iPhone 17 Pro",
+    slug: "iphone-duo",
+    name: "iPhone Duo",
+    family: "iPhone Duo",
     category: "iphone",
-    tagline: "The biggest Pro display and the longest battery life ever in an iPhone.",
+    tagline: "It opens. A 5.4-inch iPhone becomes a 7.6-inch one, and nothing about it feels like a compromise.",
     eyebrow: "New",
-    basePrice: 149900,
-    art: "phone-pro",
-    colors: TITANIUM,
+    basePrice: 299900,
+    art: "phone-fold",
+    colors: DUO_FINISHES,
     storage: [
       { id: "256gb", label: "256GB", priceDelta: 0 },
-      { id: "512gb", label: "512GB", priceDelta: 20000 },
-      { id: "1tb", label: "1TB", priceDelta: 40000 },
-      { id: "2tb", label: "2TB", priceDelta: 60000 },
+      { id: "512gb", label: "512GB", priceDelta: 25000 },
+      { id: "1tb", label: "1TB", priceDelta: 75000 },
+      { id: "2tb", label: "2TB", priceDelta: 150000 },
     ],
     highlights: [
-      { title: "6.9-inch Super Retina XDR", copy: "ProMotion up to 120Hz with an always-on display, and 2000 nits of peak outdoor brightness." },
-      { title: "Pro camera system", copy: "48MP Fusion main, 48MP Ultra Wide and a 48MP telephoto with 4x optical-quality zoom." },
-      { title: "A19 Pro chip", copy: "A 6-core GPU with hardware ray tracing, built for console-class games and on-device intelligence." },
-      { title: "All-day and then some", copy: "The longest battery life of any iPhone, with fast charge to 50% in around 20 minutes." },
+      { title: "Two displays, one iPhone", copy: "A 5.4-inch cover display for one-handed everything, and a 7.6-inch inner display when you want the room." },
+      { title: "5.2 mm unfolded", copy: "The thinnest iPhone Apple has made — thinner open than iPhone Air is closed." },
+      { title: "A20 Pro on 2 nm", copy: "The first 2-nanometre chip in an iPhone, with headroom for two full-size apps side by side." },
+      { title: "Dual-battery system", copy: "One cell in each half, charged and managed as one, so a folding phone lasts a folding-phone day." },
     ],
     specs: [
       {
-        group: "Display",
+        group: "Displays",
         rows: [
-          { k: "Size", v: "6.9-inch (diagonal) all-screen OLED" },
-          { k: "Resolution", v: "2868 × 1320 at 460 ppi" },
-          { k: "Technology", v: "Super Retina XDR with ProMotion and always-on" },
-          { k: "Brightness", v: "1000 nits typical, 2000 nits peak outdoors, 1 nit minimum" },
-          { k: "Protection", v: "Ceramic Shield 2 front" },
+          { k: "Inner", v: "7.6-inch (diagonal) foldable Super Retina XDR OLED" },
+          { k: "Cover", v: "5.4-inch (diagonal) Super Retina XDR OLED" },
+          { k: "Technology", v: "ProMotion up to 120Hz and always-on, both displays" },
+          { k: "Brightness", v: "Up to 3000 nits peak outdoors" },
+          { k: "Protection", v: "Ceramic Shield 2 on the cover display" },
         ],
       },
       {
         group: "Chip & capacity",
         rows: [
-          { k: "Chip", v: "A19 Pro with 6-core CPU and 6-core GPU" },
-          { k: "Neural Engine", v: "16-core" },
+          { k: "Chip", v: "A20 Pro, built on a 2 nm process" },
           { k: "Capacity", v: "256GB, 512GB, 1TB, 2TB" },
         ],
       },
       {
         group: "Camera",
         rows: [
-          { k: "Main", v: "48MP Fusion, ƒ/1.78, second-generation sensor-shift OIS" },
-          { k: "Ultra Wide", v: "48MP, ƒ/2.2, 120° field of view, macro" },
-          { k: "Telephoto", v: "48MP, ƒ/2.8, 4x optical zoom, up to 8x optical-quality" },
-          { k: "Front", v: "18MP Center Stage camera, ƒ/1.9, autofocus" },
-          { k: "Video", v: "4K Dolby Vision up to 120 fps, ProRes RAW, Action mode" },
+          { k: "Main", v: "48MP Dual Fusion, sensor-shift OIS" },
+          { k: "Ultra Wide", v: "48MP, 120° field of view, macro" },
+          { k: "Front", v: "Under-display camera on the inner display, plus a cover-display camera" },
+          { k: "Selfie", v: "Shoot with the rear camera using the cover display as a viewfinder" },
         ],
       },
       {
-        group: "Power & connections",
+        group: "Build & power",
         rows: [
-          { k: "Video playback", v: "Up to 39 hours" },
-          { k: "Charging", v: "USB-C, MagSafe up to 25W, Qi2" },
-          { k: "Cellular", v: "5G (sub-6 GHz), dual eSIM" },
-          { k: "Wireless", v: "Wi-Fi 7, Bluetooth 6, Thread, second-gen Ultra Wideband" },
-          { k: "Water resistance", v: "IP68 to 6 metres for up to 30 minutes" },
-        ],
-      },
-      {
-        group: "In the box & build",
-        rows: [
-          { k: "Material", v: "Grade 5 titanium with a unibody aluminium frame" },
-          { k: "Dimensions", v: "163.4 × 78.0 × 8.75 mm" },
-          { k: "Weight", v: "233 g" },
+          { k: "Thickness", v: "5.2 mm unfolded" },
+          { k: "Hinge", v: "Precision-machined, tested to Apple's fold-cycle standard" },
+          { k: "Charging", v: "USB-C, MagSafe, Qi2" },
+          { k: "Cellular", v: "5G, eSIM only" },
           { k: "Warranty", v: "1 year Apple limited warranty, serviceable at Amaira" },
         ],
       },
     ],
-    inBox: ["iPhone 17 Pro Max", "USB-C Charge Cable (1 m)", "Documentation"],
-    stock: "in",
-    rank: 100,
-    tags: ["pro", "flagship", "titanium", "120hz", "best camera", "large screen"],
-    leadTimeDays: 1,
-    careAnnual: 12900,
+    inBox: ["iPhone Duo", "USB-C Charge Cable (1 m)", "Documentation"],
+    stock: "order",
+    rank: 110,
+    tags: ["foldable", "fold", "duo", "flagship", "new", "two screens", "a20 pro"],
+    leadTimeDays: 14,
+    careAnnual: 24900,
     tradeIn: true,
   },
   {
-    slug: "iphone-17-pro",
-    name: "iPhone 17 Pro",
-    family: "iPhone 17 Pro",
+    slug: "iphone-18-pro-max",
+    name: "iPhone 18 Pro Max",
+    family: "iPhone 18 Pro",
+    category: "iphone",
+    tagline: "The biggest Pro display, a variable-aperture camera, and the longest battery life ever in an iPhone.",
+    eyebrow: "New",
+    basePrice: 179900,
+    art: "phone-pro",
+    colors: PRO_18_FINISHES,
+    storage: [
+      { id: "256gb", label: "256GB", priceDelta: 0 },
+      { id: "512gb", label: "512GB", priceDelta: 25000 },
+      { id: "1tb", label: "1TB", priceDelta: 75000 },
+      { id: "2tb", label: "2TB", priceDelta: 150000 },
+    ],
+    highlights: [
+      { title: "6.9-inch Super Retina XDR", copy: "ProMotion up to 120Hz with an always-on display, and peak outdoor brightness you can read in Bengaluru sun." },
+      { title: "Variable aperture", copy: "The 48MP main camera opens and closes its aperture — real depth-of-field control, not a simulation." },
+      { title: "A20 Pro on 2 nm", copy: "Apple's first 2-nanometre chip, with a neural accelerator in every GPU core." },
+      { title: "Up to 45 hours of video", copy: "A next-generation vapour chamber keeps it fast for longer, and the battery outlasts any iPhone before it." },
+    ],
+    specs: [
+      {
+        group: "Display",
+        rows: [
+          { k: "Size", v: "6.9-inch (diagonal) all-screen OLED" },
+          { k: "Technology", v: "Super Retina XDR with ProMotion and always-on" },
+          { k: "Brightness", v: "Up to 3000 nits peak outdoors, 1 nit minimum" },
+          { k: "Protection", v: "Ceramic Shield 2 front" },
+        ],
+      },
+      {
+        group: "Chip & capacity",
+        rows: [
+          { k: "Chip", v: "A20 Pro, built on a 2 nm process" },
+          { k: "Capacity", v: "256GB, 512GB, 1TB, 2TB" },
+        ],
+      },
+      {
+        group: "Camera",
+        rows: [
+          { k: "Main", v: "48MP Fusion with variable aperture, sensor-shift OIS" },
+          { k: "Ultra Wide", v: "48MP, 120° field of view, macro" },
+          { k: "Telephoto", v: "48MP with optical-quality zoom" },
+          { k: "Front", v: "Centre Stage camera with autofocus" },
+          { k: "Video", v: "4K Dolby Vision, ProRes RAW, Action mode" },
+        ],
+      },
+      {
+        group: "Build & power",
+        rows: [
+          { k: "Cooling", v: "Next-generation vapour chamber" },
+          { k: "Video playback", v: "Up to 45 hours" },
+          { k: "Charging", v: "USB-C, MagSafe, Qi2" },
+          { k: "Water resistance", v: "IP68" },
+          { k: "Warranty", v: "1 year Apple limited warranty, serviceable at Amaira" },
+        ],
+      },
+    ],
+    inBox: ["iPhone 18 Pro Max", "USB-C Charge Cable (1 m)", "Documentation"],
+    stock: "in",
+    rank: 100,
+    tags: ["pro", "flagship", "120hz", "best camera", "large screen", "variable aperture", "a20 pro"],
+    leadTimeDays: 1,
+    careAnnual: 15900,
+    tradeIn: true,
+  },
+  {
+    slug: "iphone-18-pro",
+    name: "iPhone 18 Pro",
+    family: "iPhone 18 Pro",
     category: "iphone",
     tagline: "All the Pro capability, in the size that disappears into a pocket.",
     eyebrow: "New",
-    basePrice: 134900,
+    basePrice: 164900,
     art: "phone-pro",
-    colors: TITANIUM,
+    colors: PRO_18_FINISHES,
     storage: [
       { id: "256gb", label: "256GB", priceDelta: 0 },
-      { id: "512gb", label: "512GB", priceDelta: 20000 },
-      { id: "1tb", label: "1TB", priceDelta: 40000 },
+      { id: "512gb", label: "512GB", priceDelta: 25000 },
+      { id: "1tb", label: "1TB", priceDelta: 75000 },
+      { id: "2tb", label: "2TB", priceDelta: 150000 },
     ],
     highlights: [
-      { title: "6.3-inch Super Retina XDR", copy: "ProMotion up to 120Hz with an always-on display in a body you can use one-handed." },
-      { title: "Pro camera system", copy: "Three 48MP cameras with 4x optical-quality telephoto and ProRes RAW capture." },
-      { title: "A19 Pro chip", copy: "Desktop-class performance per watt, with hardware-accelerated ray tracing." },
-      { title: "Titanium build", copy: "Grade 5 titanium — light in the hand, hard to mark." },
+      { title: "6.3-inch Super Retina XDR", copy: "The same ProMotion and always-on display, in a body you can use one-handed." },
+      { title: "Variable aperture", copy: "A 48MP main camera that physically stops down, for control over depth of field." },
+      { title: "A20 Pro on 2 nm", copy: "Identical silicon to the Pro Max — no compromise for choosing the smaller one." },
+      { title: "Big leap in battery", copy: "A next-generation vapour chamber and up to 24 hours of video playback." },
     ],
     specs: [
       {
@@ -116,49 +190,42 @@ export const IPHONES: Product[] = [
           { k: "Size", v: "6.3-inch (diagonal) all-screen OLED" },
           { k: "Resolution", v: "2622 × 1206 at 460 ppi" },
           { k: "Technology", v: "Super Retina XDR with ProMotion and always-on" },
-          { k: "Brightness", v: "1000 nits typical, 2000 nits peak outdoors" },
+          { k: "Protection", v: "Ceramic Shield 2 front" },
         ],
       },
       {
         group: "Chip & capacity",
         rows: [
-          { k: "Chip", v: "A19 Pro with 6-core CPU and 6-core GPU" },
-          { k: "Capacity", v: "256GB, 512GB, 1TB" },
+          { k: "Chip", v: "A20 Pro, built on a 2 nm process" },
+          { k: "Capacity", v: "256GB, 512GB, 1TB, 2TB" },
         ],
       },
       {
         group: "Camera",
         rows: [
-          { k: "Main", v: "48MP Fusion, ƒ/1.78, sensor-shift OIS" },
-          { k: "Ultra Wide", v: "48MP, ƒ/2.2, macro" },
-          { k: "Telephoto", v: "48MP, ƒ/2.8, 4x optical zoom" },
-          { k: "Front", v: "18MP Center Stage camera" },
+          { k: "Main", v: "48MP Fusion with variable aperture, sensor-shift OIS" },
+          { k: "Ultra Wide", v: "48MP, 120° field of view, macro" },
+          { k: "Telephoto", v: "48MP with optical-quality zoom" },
+          { k: "Front", v: "Centre Stage camera with autofocus" },
         ],
       },
       {
-        group: "Power & connections",
+        group: "Build & power",
         rows: [
-          { k: "Video playback", v: "Up to 31 hours" },
-          { k: "Charging", v: "USB-C, MagSafe up to 25W, Qi2" },
-          { k: "Wireless", v: "Wi-Fi 7, Bluetooth 6, Thread" },
-          { k: "Water resistance", v: "IP68 to 6 metres for up to 30 minutes" },
-        ],
-      },
-      {
-        group: "Build",
-        rows: [
-          { k: "Material", v: "Grade 5 titanium" },
-          { k: "Dimensions", v: "149.6 × 71.5 × 8.75 mm" },
-          { k: "Weight", v: "204 g" },
+          { k: "Cooling", v: "Next-generation vapour chamber" },
+          { k: "Video playback", v: "Up to 24 hours" },
+          { k: "Charging", v: "USB-C, MagSafe, Qi2" },
+          { k: "Water resistance", v: "IP68" },
+          { k: "Warranty", v: "1 year Apple limited warranty, serviceable at Amaira" },
         ],
       },
     ],
-    inBox: ["iPhone 17 Pro", "USB-C Charge Cable (1 m)", "Documentation"],
+    inBox: ["iPhone 18 Pro", "USB-C Charge Cable (1 m)", "Documentation"],
     stock: "in",
     rank: 98,
-    tags: ["pro", "titanium", "120hz", "compact", "best camera"],
+    tags: ["pro", "flagship", "120hz", "compact", "variable aperture", "a20 pro"],
     leadTimeDays: 1,
-    careAnnual: 11900,
+    careAnnual: 14900,
     tradeIn: true,
   },
   {
@@ -167,8 +234,7 @@ export const IPHONES: Product[] = [
     family: "iPhone Air",
     category: "iphone",
     tagline: "The thinnest iPhone ever made. You feel it the moment you pick it up.",
-    eyebrow: "New",
-    basePrice: 119900,
+    basePrice: 149900,
     art: "phone",
     colors: [
       { id: "sky-blue", name: "Sky Blue", hex: "#b9c9d9", accent: "#98adc1", screen: "#161b22" },
@@ -178,8 +244,8 @@ export const IPHONES: Product[] = [
     ],
     storage: [
       { id: "256gb", label: "256GB", priceDelta: 0 },
-      { id: "512gb", label: "512GB", priceDelta: 20000 },
-      { id: "1tb", label: "1TB", priceDelta: 40000 },
+      { id: "512gb", label: "512GB", priceDelta: 25000 },
+      { id: "1tb", label: "1TB", priceDelta: 75000 },
     ],
     highlights: [
       { title: "5.6 mm thin", copy: "A titanium frame engineered to be astonishingly thin without giving up rigidity." },
@@ -207,7 +273,7 @@ export const IPHONES: Product[] = [
         group: "Camera",
         rows: [
           { k: "Rear", v: "48MP Fusion, ƒ/1.6, 2x optical-quality telephoto" },
-          { k: "Front", v: "18MP Center Stage camera" },
+          { k: "Front", v: "18MP Centre Stage camera" },
         ],
       },
       {
@@ -222,11 +288,11 @@ export const IPHONES: Product[] = [
       },
     ],
     inBox: ["iPhone Air", "USB-C Charge Cable (1 m)", "Documentation"],
-    stock: "low",
-    rank: 96,
-    tags: ["thin", "light", "titanium", "esim", "new"],
-    leadTimeDays: 3,
-    careAnnual: 11900,
+    stock: "in",
+    rank: 92,
+    tags: ["thin", "light", "titanium", "esim", "120hz"],
+    leadTimeDays: 1,
+    careAnnual: 12900,
     tradeIn: true,
   },
   {
@@ -234,26 +300,19 @@ export const IPHONES: Product[] = [
     name: "iPhone 17",
     family: "iPhone 17",
     category: "iphone",
-    tagline: "ProMotion, a bigger display and a 48MP Dual Fusion camera. Now standard.",
-    eyebrow: "New",
-    basePrice: 82900,
+    tagline: "ProMotion, a 48MP dual-camera system, and a screen that finally never sleeps.",
+    basePrice: 99900,
     art: "phone",
-    colors: [
-      { id: "lavender", name: "Lavender", hex: "#cfc4e4", accent: "#b3a5cd", screen: "#1e1b2b" },
-      { id: "mist-blue", name: "Mist Blue", hex: "#b8cbd8", accent: "#9ab0c0", screen: "#141b22" },
-      { id: "sage", name: "Sage", hex: "#c3cfba", accent: "#a5b39b", screen: "#171d15" },
-      { id: "white", name: "White", hex: "#f2f1ee", accent: "#d6d4cf", screen: "#2c2c2e" },
-      { id: "black", name: "Black", hex: "#34333a", accent: "#222128", screen: "#0d0d10" },
-    ],
+    colors: ALUMINIUM_BRIGHT,
     storage: [
       { id: "256gb", label: "256GB", priceDelta: 0 },
-      { id: "512gb", label: "512GB", priceDelta: 20000 },
+      { id: "512gb", label: "512GB", priceDelta: 25000 },
     ],
     highlights: [
-      { title: "6.3-inch ProMotion display", copy: "120Hz and always-on come to the standard iPhone for the first time." },
-      { title: "Dual Fusion camera", copy: "48MP main and 48MP Ultra Wide, with a 2x optical-quality zoom." },
-      { title: "A19 chip", copy: "Fast, efficient, and ready for everything on-device intelligence asks of it." },
-      { title: "Ceramic Shield 2", copy: "Three times better scratch resistance on the front." },
+      { title: "120Hz ProMotion", copy: "The smooth, always-on display, now on the standard iPhone." },
+      { title: "Dual 48MP cameras", copy: "48MP Fusion main and 48MP Ultra Wide, with a 2x optical-quality zoom." },
+      { title: "A19 chip", copy: "Fast, efficient, and built for Apple Intelligence." },
+      { title: "256GB to start", copy: "Twice the storage of the iPhone it replaces, at the entry tier." },
     ],
     specs: [
       {
@@ -261,7 +320,7 @@ export const IPHONES: Product[] = [
         rows: [
           { k: "Size", v: "6.3-inch (diagonal) all-screen OLED" },
           { k: "Technology", v: "Super Retina XDR with ProMotion and always-on" },
-          { k: "Brightness", v: "Up to 3000 nits peak outdoors" },
+          { k: "Protection", v: "Ceramic Shield 2 front" },
         ],
       },
       {
@@ -274,27 +333,83 @@ export const IPHONES: Product[] = [
       {
         group: "Camera",
         rows: [
-          { k: "Main", v: "48MP Fusion, ƒ/1.6" },
-          { k: "Ultra Wide", v: "48MP, ƒ/2.2, macro" },
-          { k: "Front", v: "18MP Center Stage camera" },
+          { k: "Main", v: "48MP Fusion, ƒ/1.6, 2x optical-quality telephoto" },
+          { k: "Ultra Wide", v: "48MP, 120° field of view, macro" },
+          { k: "Front", v: "18MP Centre Stage camera" },
         ],
       },
       {
-        group: "Power & build",
+        group: "Power",
         rows: [
           { k: "Video playback", v: "Up to 30 hours" },
           { k: "Charging", v: "USB-C, MagSafe, Qi2" },
           { k: "Water resistance", v: "IP68" },
-          { k: "Weight", v: "177 g" },
         ],
       },
     ],
     inBox: ["iPhone 17", "USB-C Charge Cable (1 m)", "Documentation"],
     stock: "in",
-    rank: 94,
-    tags: ["mainstream", "120hz", "value", "new"],
+    rank: 90,
+    tags: ["popular", "120hz", "dual camera", "everyday"],
     leadTimeDays: 1,
     careAnnual: 9900,
+    tradeIn: true,
+  },
+  {
+    slug: "iphone-17e",
+    name: "iPhone 17e",
+    family: "iPhone 17e",
+    category: "iphone",
+    tagline: "The most affordable way into Apple Intelligence — now starting at 256GB.",
+    basePrice: 79900,
+    art: "phone",
+    colors: E_FINISHES,
+    storage: [
+      { id: "256gb", label: "256GB", priceDelta: 0 },
+      { id: "512gb", label: "512GB", priceDelta: 25000 },
+    ],
+    highlights: [
+      { title: "A19 chip", copy: "The same generation of silicon as iPhone 17, built for Apple Intelligence." },
+      { title: "48MP 2-in-1 camera", copy: "A 48MP Fusion camera with a built-in 2x telephoto." },
+      { title: "256GB to start", copy: "Twice the entry storage of the iPhone 16e it replaces." },
+      { title: "Ceramic Shield 2", copy: "The tougher front cover glass, on the entry iPhone." },
+    ],
+    specs: [
+      {
+        group: "Display",
+        rows: [
+          { k: "Size", v: "6.1-inch Super Retina XDR" },
+          { k: "Protection", v: "Ceramic Shield 2 front" },
+        ],
+      },
+      {
+        group: "Chip & capacity",
+        rows: [
+          { k: "Chip", v: "A19" },
+          { k: "Capacity", v: "256GB, 512GB" },
+        ],
+      },
+      {
+        group: "Camera",
+        rows: [
+          { k: "Rear", v: "48MP Fusion, 2x optical-quality telephoto" },
+          { k: "Front", v: "Centre Stage camera" },
+        ],
+      },
+      {
+        group: "Power",
+        rows: [
+          { k: "Charging", v: "USB-C, Qi2 wireless" },
+          { k: "Cellular", v: "5G with Apple's own modem" },
+        ],
+      },
+    ],
+    inBox: ["iPhone 17e", "USB-C Charge Cable (1 m)", "Documentation"],
+    stock: "in",
+    rank: 82,
+    tags: ["affordable", "entry", "a19", "apple intelligence"],
+    leadTimeDays: 1,
+    careAnnual: 7900,
     tradeIn: true,
   },
   {
@@ -302,85 +417,57 @@ export const IPHONES: Product[] = [
     name: "iPhone 16",
     family: "iPhone 16",
     category: "iphone",
-    tagline: "Camera Control, the A18 chip and a great price. Still a brilliant buy.",
-    basePrice: 69900,
-    mrp: 79900,
+    tagline: "Still a brilliant iPhone, still on sale, still with Camera Control.",
+    basePrice: 89900,
     art: "phone",
     colors: ALUMINIUM_BRIGHT,
-    storage: [
-      { id: "128gb", label: "128GB", priceDelta: 0 },
-      { id: "256gb", label: "256GB", priceDelta: 10000 },
-      { id: "512gb", label: "512GB", priceDelta: 30000 },
-    ],
+    /* Apple India now lists iPhone 16 as a single 128GB configuration
+       ("Comes with 128GB storage"). If your APR allocation includes the
+       256GB SKU, add it here with the delta from your price list. */
+    storage: [{ id: "128gb", label: "128GB", priceDelta: 0 }],
     highlights: [
-      { title: "Camera Control", copy: "A dedicated control for framing, zoom and depth — press, slide, shoot." },
+      { title: "Camera Control", copy: "A capacitive button on the side that opens the camera and scrubs through its controls." },
       { title: "A18 chip", copy: "Built for Apple Intelligence, with a 5-core GPU." },
-      { title: "48MP Fusion camera", copy: "Plus a 2x optical-quality telephoto and a macro-capable Ultra Wide." },
-      { title: "Action button", copy: "Map it to the camera, torch, a shortcut, or silent mode." },
+      { title: "48MP Fusion camera", copy: "With a 2x telephoto and a 12MP Ultra Wide for macro." },
+      { title: "Action button", copy: "Assign it to the torch, Focus, Shortcuts — whatever you actually use." },
     ],
     specs: [
       {
         group: "Display",
         rows: [
-          { k: "Size", v: "6.1-inch (diagonal) all-screen OLED" },
-          { k: "Technology", v: "Super Retina XDR" },
+          { k: "Size", v: "6.1-inch Super Retina XDR" },
           { k: "Brightness", v: "Up to 2000 nits peak outdoors" },
         ],
       },
-      { group: "Chip & capacity", rows: [{ k: "Chip", v: "A18" }, { k: "Capacity", v: "128GB, 256GB, 512GB" }] },
+      {
+        group: "Chip & capacity",
+        rows: [
+          { k: "Chip", v: "A18 with 5-core GPU" },
+          { k: "Capacity", v: "128GB" },
+        ],
+      },
       {
         group: "Camera",
         rows: [
-          { k: "Main", v: "48MP Fusion, ƒ/1.6" },
-          { k: "Ultra Wide", v: "12MP, ƒ/2.2, macro" },
+          { k: "Main", v: "48MP Fusion, ƒ/1.6, 2x telephoto" },
+          { k: "Ultra Wide", v: "12MP, macro" },
           { k: "Front", v: "12MP TrueDepth" },
         ],
       },
-      { group: "Power", rows: [{ k: "Video playback", v: "Up to 22 hours" }, { k: "Charging", v: "USB-C, MagSafe, Qi2" }] },
+      {
+        group: "Power",
+        rows: [
+          { k: "Video playback", v: "Up to 22 hours" },
+          { k: "Charging", v: "USB-C, MagSafe, Qi2" },
+        ],
+      },
     ],
     inBox: ["iPhone 16", "USB-C Charge Cable (1 m)", "Documentation"],
     stock: "in",
-    rank: 88,
-    tags: ["value", "camera control", "a18", "offer"],
+    rank: 78,
+    tags: ["a18", "camera control", "action button", "value"],
     leadTimeDays: 1,
-    careAnnual: 9900,
-    tradeIn: true,
-  },
-  {
-    slug: "iphone-16e",
-    name: "iPhone 16e",
-    family: "iPhone 16e",
-    category: "iphone",
-    tagline: "The most affordable way into Apple Intelligence.",
-    basePrice: 59900,
-    art: "phone",
-    colors: [
-      { id: "white", name: "White", hex: "#f3f2ef", accent: "#d8d6d1", screen: "#2c2c2e" },
-      { id: "black", name: "Black", hex: "#2f2f33", accent: "#1f1f23", screen: "#0c0c0e" },
-    ],
-    storage: [
-      { id: "128gb", label: "128GB", priceDelta: 0 },
-      { id: "256gb", label: "256GB", priceDelta: 8000 },
-      { id: "512gb", label: "512GB", priceDelta: 28000 },
-    ],
-    highlights: [
-      { title: "A18 chip", copy: "The same generation of silicon as iPhone 16, built for Apple Intelligence." },
-      { title: "2-in-1 camera", copy: "A 48MP Fusion camera with a built-in 2x telephoto." },
-      { title: "Best-in-class battery", copy: "Up to 26 hours of video playback." },
-      { title: "Apple C1 modem", copy: "Apple's first in-house cellular modem, tuned for efficiency." },
-    ],
-    specs: [
-      { group: "Display", rows: [{ k: "Size", v: "6.1-inch Super Retina XDR" }, { k: "Brightness", v: "Up to 1200 nits peak (HDR)" }] },
-      { group: "Chip & capacity", rows: [{ k: "Chip", v: "A18 with 4-core GPU" }, { k: "Capacity", v: "128GB, 256GB, 512GB" }] },
-      { group: "Camera", rows: [{ k: "Rear", v: "48MP Fusion, ƒ/1.6, 2x telephoto" }, { k: "Front", v: "12MP TrueDepth" }] },
-      { group: "Power", rows: [{ k: "Video playback", v: "Up to 26 hours" }, { k: "Charging", v: "USB-C, Qi2 wireless" }] },
-    ],
-    inBox: ["iPhone 16e", "USB-C Charge Cable (1 m)", "Documentation"],
-    stock: "in",
-    rank: 80,
-    tags: ["affordable", "entry", "a18", "battery"],
-    leadTimeDays: 1,
-    careAnnual: 7900,
+    careAnnual: 8900,
     tradeIn: true,
   },
 ];

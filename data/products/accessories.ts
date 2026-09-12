@@ -1,5 +1,11 @@
 /* ==========================================================================
-   Accessories — ⚠️ VERIFY prices before go-live.
+   Accessories — Magic Mouse (₹8,900), Magic Trackpad (₹12,500), Magic
+   Keyboard with Touch ID (₹14,500), the iPad Pro Magic Keyboards (₹29,900
+   / ₹33,900), Apple Pencil Pro (₹11,900), Apple Pencil USB-C (₹7,900) and
+   the AirTag 4-pack (₹12,900) were reconciled against apple.com/in on
+   12 September 2026. ⚠️ The remaining lines (MagSafe Charger, power
+   adapters, cables, cases, bands, Studio Display, ear tips) were NOT
+   re-confirmed — check them against your APR price list before go-live.
    Accessories carry lighter data than the hero products, so they are built
    through a small helper rather than written out longhand.
    ========================================================================== */
@@ -126,7 +132,7 @@ export const ACCESSORIES: Product[] = [
     variantTitle: "Size",
     variants: [
       { id: "11", label: 'For 11-inch iPad Pro', priceDelta: 0 },
-      { id: "13", label: 'For 13-inch iPad Pro', priceDelta: 5000 },
+      { id: "13", label: 'For 13-inch iPad Pro', priceDelta: 4000 },
     ],
     highlights: [
       { title: "Function row", copy: "Brightness, volume and Escape, where your fingers expect them." },
@@ -148,7 +154,7 @@ export const ACCESSORIES: Product[] = [
     name: "Magic Keyboard with Touch ID",
     family: "Magic Keyboard",
     tagline: "Unlock, authenticate and pay with a fingerprint.",
-    price: 14900,
+    price: 14500,
     art: "keyboard",
     colors: [
       { id: "white", name: "White and Silver", hex: "#ecebe9", accent: "#cfcecb", screen: "#0f0f11" },
@@ -157,7 +163,7 @@ export const ACCESSORIES: Product[] = [
     variantTitle: "Layout",
     variants: [
       { id: "compact", label: "Compact layout", priceDelta: 0 },
-      { id: "numeric", label: "With numeric keypad", priceDelta: 4000 },
+      { id: "numeric", label: "With numeric keypad", priceDelta: 5000 },
     ],
     highlights: [
       { title: "Touch ID", copy: "Works with any Mac with Apple silicon." },
@@ -178,7 +184,7 @@ export const ACCESSORIES: Product[] = [
     name: "Magic Mouse",
     family: "Magic Mouse",
     tagline: "A single smooth surface that understands gestures.",
-    price: 9500,
+    price: 8900,
     art: "mouse",
     colors: [
       { id: "white", name: "White", hex: "#eeedeb", accent: "#d3d2cf", screen: "#eeedeb" },
@@ -203,7 +209,7 @@ export const ACCESSORIES: Product[] = [
     name: "Magic Trackpad",
     family: "Magic Trackpad",
     tagline: "A large glass surface with Force Touch, for every macOS gesture.",
-    price: 13500,
+    price: 12500,
     art: "trackpad",
     colors: [
       { id: "white", name: "White", hex: "#efeeec", accent: "#d4d3d0", screen: "#efeeec" },
@@ -233,7 +239,7 @@ export const ACCESSORIES: Product[] = [
     variantTitle: "Pack",
     variants: [
       { id: "1", label: "1 pack", priceDelta: 0 },
-      { id: "4", label: "4 pack", priceDelta: 8410, note: "Better value per tag" },
+      { id: "4", label: "4 pack", priceDelta: 9410, note: "Better value per tag" },
     ],
     highlights: [
       { title: "Precision Finding", copy: "On iPhone 11 and later, an on-screen arrow walks you to it." },
@@ -343,10 +349,11 @@ export const ACCESSORIES: Product[] = [
     colors: CASE_COLORS,
     variantTitle: "Model",
     variants: [
-      { id: "17", label: "For iPhone 17", priceDelta: 0 },
-      { id: "17-pro", label: "For iPhone 17 Pro", priceDelta: 0 },
-      { id: "17-pro-max", label: "For iPhone 17 Pro Max", priceDelta: 0 },
+      { id: "18-pro", label: "For iPhone 18 Pro", priceDelta: 0 },
+      { id: "18-pro-max", label: "For iPhone 18 Pro Max", priceDelta: 0 },
       { id: "air", label: "For iPhone Air", priceDelta: 0 },
+      { id: "17", label: "For iPhone 17", priceDelta: 0 },
+      { id: "17e", label: "For iPhone 17e", priceDelta: 0 },
     ],
     highlights: [
       { title: "MagSafe magnets", copy: "Charges and attaches without taking the case off." },
@@ -372,10 +379,11 @@ export const ACCESSORIES: Product[] = [
     colors: [{ id: "clear", name: "Clear", hex: "#e9edf1", accent: "#c9d2da", screen: "#e9edf1" }],
     variantTitle: "Model",
     variants: [
-      { id: "17", label: "For iPhone 17", priceDelta: 0 },
-      { id: "17-pro", label: "For iPhone 17 Pro", priceDelta: 0 },
-      { id: "17-pro-max", label: "For iPhone 17 Pro Max", priceDelta: 0 },
+      { id: "18-pro", label: "For iPhone 18 Pro", priceDelta: 0 },
+      { id: "18-pro-max", label: "For iPhone 18 Pro Max", priceDelta: 0 },
       { id: "air", label: "For iPhone Air", priceDelta: 0 },
+      { id: "17", label: "For iPhone 17", priceDelta: 0 },
+      { id: "17e", label: "For iPhone 17e", priceDelta: 0 },
     ],
     highlights: [
       { title: "Stays clear", copy: "An optical coating on both sides resists yellowing." },

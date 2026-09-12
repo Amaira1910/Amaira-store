@@ -134,6 +134,83 @@ export function seedCatalog(opts: { openingStock?: number } = {}): SeedResult {
   return result;
 }
 
+/* -------------------------------------------------------------- repricing */
+
+export interface RepriceRow {
+  skuCode: string;
+  productSlug: string;
+  variant: string;
+  from: number;
+  to: number;
+}
+
+export interface RepriceResult {
+  changed: RepriceRow[];
+  unchanged: number;
+  /** SKUs in the database that the catalog no longer lists at all. */
+  orphaned: string[];
+}
+
+/**
+ * Pull catalog prices into the database, overwriting what is there.
+ *
+ * seedCatalog() deliberately never touches a price the shop has set, which is
+ * right for day-to-day operation — but it is wrong the day Apple reprices the
+ * line-up, because carried-over models keep their old MRP forever. This is the
+ * explicit, opt-in way to push a catalog price change through.
+ *
+ * Pass `dryRun: true` to see what would change without writing anything. Rows
+ * whose price already matches are left alone, so the returned list is exactly
+ * what moved.
+ */
+export function repriceFromCatalog(opts: { dryRun?: boolean } = {}): RepriceResult {
+  const dryRun = opts.dryRun ?? false;
+  const result: RepriceResult = { changed: [], unchanged: 0, orphaned: [] };
+
+  const wanted = new Map<string, { price: number; mrp: number | null; slug: string; variant: string }>();
+  for (const p of PRODUCTS) {
+    for (const v of variantsOf(p)) {
+      wanted.set(skuCodeFor(p.slug, v.colorId, v.storageId, v.sizeId), {
+        price: v.price,
+        mrp: p.mrp ? p.mrp + (v.price - p.basePrice) : null,
+        slug: p.slug,
+        variant: [v.colorName, v.storageLabel, v.sizeLabel].filter(Boolean).join(" · "),
+      });
+    }
+  }
+
+  tx((conn) => {
+    const rows = conn
+      .prepare(`SELECT sku_code, price FROM skus`)
+      .all() as { sku_code: string; price: number }[];
+    const update = conn.prepare(
+      `UPDATE skus SET price = ?, mrp = ?, updated_at = datetime('now') WHERE sku_code = ?`,
+    );
+
+    for (const row of rows) {
+      const target = wanted.get(row.sku_code);
+      if (!target) {
+        result.orphaned.push(row.sku_code);
+        continue;
+      }
+      if (target.price === row.price) {
+        result.unchanged += 1;
+        continue;
+      }
+      result.changed.push({
+        skuCode: row.sku_code,
+        productSlug: target.slug,
+        variant: target.variant,
+        from: row.price,
+        to: target.price,
+      });
+      if (!dryRun) update.run(target.price, target.mrp, row.sku_code);
+    }
+  });
+
+  return result;
+}
+
 /** Default store settings, written once. */
 export function seedSettings(): void {
   const db = getDb();

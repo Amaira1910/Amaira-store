@@ -1,4 +1,7 @@
-/* AirPods & audio — ⚠️ VERIFY prices before go-live. */
+/* AirPods & audio — reconciled against apple.com/in on 12 September 2026.
+   Apple India's AirPods line-up is now AirPods 5, AirPods Pro 3 and
+   AirPods Max 2. AirPods 4 (both variants) were replaced by AirPods 5 on
+   9 Sept 2026. Prices are Apple India retail MRP, inclusive of all taxes. */
 import type { Product } from "@/lib/types";
 import { AUDIO_WHITE } from "../palettes";
 
@@ -10,7 +13,7 @@ export const AUDIO: Product[] = [
     category: "audio",
     tagline: "The world's best in-ear Active Noise Cancellation, with a heart rate sensor.",
     eyebrow: "New",
-    basePrice: 25900,
+    basePrice: 27900,
     art: "buds",
     colors: AUDIO_WHITE,
     highlights: [
@@ -45,74 +48,62 @@ export const AUDIO: Product[] = [
     tradeIn: false,
   },
   {
-    slug: "airpods-4-anc",
-    name: "AirPods 4 with Active Noise Cancellation",
+    slug: "airpods-5",
+    name: "AirPods 5",
     family: "AirPods",
     category: "audio",
-    tagline: "The open-ear fit you love, now with noise cancellation.",
-    basePrice: 17900,
+    tagline: "Active Noise Cancellation in Apple's open-ear design, with Live Translation built in.",
+    eyebrow: "New",
+    basePrice: 14900,
     art: "buds",
     colors: AUDIO_WHITE,
+    storageTitle: "Charging case",
+    storage: [
+      { id: "standard", label: "Charging Case", priceDelta: 0 },
+      {
+        id: "wireless",
+        label: "Wireless Charging Case",
+        priceDelta: 3000,
+        note: "Adds a force sensor with volume swipe, and longer battery life",
+      },
+    ],
     highlights: [
-      { title: "ANC in an open fit", copy: "Noise cancellation without an in-ear seal — a genuine engineering feat." },
-      { title: "Personalised Spatial Audio", copy: "Sound that stays anchored as you turn your head." },
-      { title: "Smaller case", copy: "The most compact AirPods case yet, with speaker and Find My." },
-      { title: "Voice Isolation", copy: "Your voice, not the traffic, on every call." },
+      { title: "ANC in an open fit", copy: "Noise cancellation without an in-ear seal — now 50% stronger than the generation before." },
+      { title: "Redesigned acoustics", copy: "A new acoustic architecture, shaped from thousands of ear scans, that simply stays put." },
+      { title: "Live Translation", copy: "Hear a translation of what someone is saying, in the moment, hands free." },
+      { title: "Hands-free Siri", copy: "Apple Intelligence features you can use without reaching for your iPhone." },
     ],
     specs: [
       { group: "Audio", rows: [
         { k: "Noise control", v: "Active Noise Cancellation, Adaptive Audio, Transparency" },
-        { k: "Chip", v: "Apple H2" },
         { k: "Fit", v: "Open ear, no tips" },
+        { k: "Spatial Audio", v: "Personalised with head tracking" },
       ]},
-      { group: "Battery", rows: [
-        { k: "Listening", v: "Up to 4 hours with ANC, 5 hours without" },
-        { k: "With case", v: "Up to 20 hours total" },
-        { k: "Charging", v: "USB-C and wireless" },
+      { group: "Features", rows: [
+        { k: "Live Translation", v: "Supported, with Apple Intelligence" },
+        { k: "Siri", v: "Hands-free interactions" },
+        { k: "Find My", v: "Case with speaker and Precision Finding" },
+      ]},
+      { group: "Charging", rows: [
+        { k: "Standard case", v: "USB-C" },
+        { k: "Wireless Charging Case", v: "USB-C and wireless, with a force sensor for volume swipe" },
       ]},
     ],
-    inBox: ["AirPods 4", "Charging Case (USB-C)", "USB-C Charge Cable"],
+    inBox: ["AirPods 5", "Charging Case (USB-C)", "USB-C Charge Cable"],
     stock: "in",
     rank: 77,
-    tags: ["open fit", "anc", "value"],
+    tags: ["open fit", "anc", "new", "live translation", "gift"],
     leadTimeDays: 1,
     careAnnual: 2400,
     tradeIn: false,
   },
   {
-    slug: "airpods-4",
-    name: "AirPods 4",
-    family: "AirPods",
-    category: "audio",
-    tagline: "A better fit, better sound, and the smallest case yet.",
-    basePrice: 12900,
-    art: "buds",
-    colors: AUDIO_WHITE,
-    highlights: [
-      { title: "Redesigned fit", copy: "Shaped from thousands of ear scans, so they simply stay put." },
-      { title: "Personalised Spatial Audio", copy: "Cinema sound from a bud that weighs almost nothing." },
-      { title: "H2 chip", copy: "Clearer calls with Voice Isolation, and instant switching between devices." },
-      { title: "Up to 30 hours", copy: "Five hours per charge, thirty with the case." },
-    ],
-    specs: [
-      { group: "Audio", rows: [{ k: "Chip", v: "Apple H2" }, { k: "Fit", v: "Open ear" }, { k: "Spatial Audio", v: "Personalised with head tracking" }] },
-      { group: "Battery", rows: [{ k: "Listening", v: "Up to 5 hours" }, { k: "With case", v: "Up to 30 hours" }, { k: "Charging", v: "USB-C" }] },
-    ],
-    inBox: ["AirPods 4", "Charging Case (USB-C)", "USB-C Charge Cable"],
-    stock: "in",
-    rank: 72,
-    tags: ["entry", "open fit", "gift"],
-    leadTimeDays: 1,
-    careAnnual: 1900,
-    tradeIn: false,
-  },
-  {
-    slug: "airpods-max",
-    name: "AirPods Max",
+    slug: "airpods-max-2",
+    name: "AirPods Max 2",
     family: "AirPods Max",
     category: "audio",
     tagline: "Over-ear. Uncompromising. Now with USB-C and lossless audio.",
-    basePrice: 59900,
+    basePrice: 74900,
     art: "headphones",
     colors: [
       { id: "midnight", name: "Midnight", hex: "#3a3b40", accent: "#2a2b2f", screen: "#3a3b40" },
@@ -141,7 +132,7 @@ export const AUDIO: Product[] = [
       ]},
       { group: "Battery", rows: [{ k: "Listening", v: "Up to 20 hours" }, { k: "Charging", v: "USB-C" }] },
     ],
-    inBox: ["AirPods Max", "Smart Case", "USB-C Charge Cable (1 m)"],
+    inBox: ["AirPods Max 2", "Smart Case", "USB-C Charge Cable (1 m)"],
     stock: "low",
     rank: 68,
     tags: ["over ear", "audiophile", "lossless", "premium"],

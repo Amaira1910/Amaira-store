@@ -46,13 +46,14 @@ export default function HomePage() {
   const status = openState();
 
   const slides: Slide[] = [
-    slideFor("iphone-17-pro", {
+    slideFor("iphone-duo", {
       eyebrow: "New",
       theme: "dark",
       glow: ["rgba(95,107,125,0.55)", "rgba(30,40,60,0.35)"],
     }),
-    slideFor("macbook-air-13-m4", { eyebrow: "Apple silicon", theme: "mist" }),
-    slideFor("airpods-pro-3", { eyebrow: "New", theme: "paper" }),
+    slideFor("iphone-18-pro-max", { eyebrow: "New", theme: "mist" }),
+    slideFor("macbook-air-13-m5", { eyebrow: "Apple silicon", theme: "paper" }),
+    slideFor("apple-watch-series-12", { eyebrow: "New", theme: "dark", glow: ["rgba(106,79,66,0.5)", "rgba(30,22,18,0.35)"] }),
     {
       key: "store",
       eyebrow: "Sanjaynagar Main Road",
@@ -66,16 +67,16 @@ export default function HomePage() {
   ];
 
   const inStock = [
-    "iphone-17-pro-max", "macbook-air-13-m4", "apple-watch-series-11",
-    "airpods-pro-3", "ipad-air-11-m3", "mac-mini-m4",
+    "iphone-18-pro-max", "macbook-air-13-m5", "apple-watch-series-12",
+    "airpods-pro-3", "ipad-air-11-m4", "mac-mini-m6",
   ]
     .map((s) => getProduct(s))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
-  const iphonePro = getProduct("iphone-17-pro-max")!;
-  const watch = getProduct("apple-watch-series-11")!;
-  const air = getProduct("macbook-air-13-m4")!;
-  const ipad = getProduct("ipad-pro-13-m4")!;
+  const iphonePro = getProduct("iphone-18-pro-max")!;
+  const watch = getProduct("apple-watch-series-12")!;
+  const air = getProduct("macbook-air-13-m5")!;
+  const ipad = getProduct("ipad-pro-13-m5")!;
 
   return (
     <>

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default function EducationPage() {
-  const picks = ["macbook-air-13-m4", "ipad-air-11-m3", "macbook-pro-14-m4-pro", "apple-pencil-pro"]
+  const picks = ["macbook-air-13-m5", "ipad-air-11-m4", "macbook-neo", "apple-pencil-pro"]
     .map((s) => getProduct(s))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
 

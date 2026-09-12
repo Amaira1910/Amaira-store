@@ -1,34 +1,39 @@
-/* iPad — ⚠️ VERIFY prices and configurations before go-live. */
+/* iPad — reconciled against apple.com/in on 12 September 2026.
+   Current line-up: iPad Pro (M5) 13"/11", iPad Air (M4) 13"/11", iPad (A16),
+   iPad mini (A17 Pro). Prices are Apple India retail MRP, inclusive of all
+   taxes, and every storage/connectivity delta below is derived from Apple's
+   own per-SKU MRPs so base + delta equals the listed price.
+   ⚠️ Reconcile against your APR price list before go-live. */
 import type { Product } from "@/lib/types";
 import { IPAD_FINISHES } from "../palettes";
 
 export const IPADS: Product[] = [
   {
-    slug: "ipad-pro-13-m4",
-    name: 'iPad Pro 13" M4',
+    slug: "ipad-pro-13-m5",
+    name: 'iPad Pro 13" M5',
     family: "iPad Pro",
     category: "ipad",
     tagline: "The thinnest Apple product ever, with a display that has to be seen.",
     eyebrow: "Ultra Retina XDR",
-    basePrice: 129900,
+    basePrice: 199900,
     art: "tablet",
     colors: IPAD_FINISHES,
     storage: [
-      { id: "256gb", label: "256GB", priceDelta: 0, note: "9-core CPU · 8GB memory" },
-      { id: "512gb", label: "512GB", priceDelta: 20000, note: "9-core CPU · 8GB memory" },
-      { id: "1tb", label: "1TB", priceDelta: 50000, note: "10-core CPU · 16GB memory" },
-      { id: "2tb", label: "2TB", priceDelta: 90000, note: "10-core CPU · 16GB memory" },
+      { id: "256gb", label: "256GB", priceDelta: 0, note: "9-core CPU · 12GB memory" },
+      { id: "512gb", label: "512GB", priceDelta: 24000, note: "9-core CPU · 12GB memory" },
+      { id: "1tb", label: "1TB", priceDelta: 72000, note: "10-core CPU · 16GB memory" },
+      { id: "2tb", label: "2TB", priceDelta: 132000, note: "10-core CPU · 16GB memory" },
     ],
     sizes: {
       title: "Connectivity",
       options: [
         { id: "wifi", label: "Wi-Fi", priceDelta: 0 },
-        { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 20000, note: "5G and eSIM" },
+        { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 24000, note: "5G and eSIM" },
       ],
     },
     highlights: [
       { title: "Ultra Retina XDR", copy: "Tandem OLED — two OLED panels stacked for 1000 nits full-screen and 1600 nits peak HDR." },
-      { title: "M4 chip", copy: "Desktop-class silicon with hardware ray tracing, in a 5.1 mm body." },
+      { title: "M5 chip", copy: "Desktop-class silicon with hardware ray tracing, in a 5.1 mm body." },
       { title: "Apple Pencil Pro", copy: "Squeeze, barrel roll and haptic feedback, with Find My built in." },
       { title: "5.1 mm thin", copy: "Thinner than an iPod nano, and more rigid than the iPad it replaces." },
     ],
@@ -41,7 +46,7 @@ export const IPADS: Product[] = [
         { k: "Option", v: "Nano-texture glass available on 1TB and 2TB" },
       ]},
       { group: "Chip & capacity", rows: [
-        { k: "Chip", v: "Apple M4" },
+        { k: "Chip", v: "Apple M5" },
         { k: "Memory", v: "8GB (256GB/512GB) or 16GB (1TB/2TB)" },
       ]},
       { group: "Camera & audio", rows: [
@@ -64,30 +69,30 @@ export const IPADS: Product[] = [
     tradeIn: true,
   },
   {
-    slug: "ipad-pro-11-m4",
-    name: 'iPad Pro 11" M4',
+    slug: "ipad-pro-11-m5",
+    name: 'iPad Pro 11" M5',
     family: "iPad Pro",
     category: "ipad",
     tagline: "Every bit as capable, in the size you will actually carry.",
-    basePrice: 99900,
+    basePrice: 139900,
     art: "tablet",
     colors: IPAD_FINISHES,
     storage: [
-      { id: "256gb", label: "256GB", priceDelta: 0, note: "9-core CPU · 8GB memory" },
-      { id: "512gb", label: "512GB", priceDelta: 20000, note: "9-core CPU · 8GB memory" },
-      { id: "1tb", label: "1TB", priceDelta: 50000, note: "10-core CPU · 16GB memory" },
-      { id: "2tb", label: "2TB", priceDelta: 90000, note: "10-core CPU · 16GB memory" },
+      { id: "256gb", label: "256GB", priceDelta: 0, note: "9-core CPU · 12GB memory" },
+      { id: "512gb", label: "512GB", priceDelta: 24000, note: "9-core CPU · 12GB memory" },
+      { id: "1tb", label: "1TB", priceDelta: 72000, note: "10-core CPU · 16GB memory" },
+      { id: "2tb", label: "2TB", priceDelta: 132000, note: "10-core CPU · 16GB memory" },
     ],
     sizes: {
       title: "Connectivity",
       options: [
         { id: "wifi", label: "Wi-Fi", priceDelta: 0 },
-        { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 20000, note: "5G and eSIM" },
+        { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 24000, note: "5G and eSIM" },
       ],
     },
     highlights: [
       { title: "Ultra Retina XDR", copy: "Tandem OLED with ProMotion, in an 11-inch frame." },
-      { title: "M4 chip", copy: "Faster than most laptops, and it runs Final Cut and Logic." },
+      { title: "M5 chip", copy: "Faster than most laptops, and it runs Final Cut and Logic." },
       { title: "5.3 mm thin", copy: "Under 450 g. It goes everywhere." },
       { title: "Magic Keyboard", copy: "A floating design with a function row and a larger trackpad." },
     ],
@@ -97,7 +102,7 @@ export const IPADS: Product[] = [
         { k: "Resolution", v: "2420 × 1668 at 264 ppi" },
         { k: "Refresh", v: "ProMotion up to 120Hz" },
       ]},
-      { group: "Chip & capacity", rows: [{ k: "Chip", v: "Apple M4" }, { k: "Memory", v: "8GB or 16GB" }] },
+      { group: "Chip & capacity", rows: [{ k: "Chip", v: "Apple M5" }, { k: "Memory", v: "8GB or 16GB" }] },
       { group: "Build", rows: [
         { k: "Thickness", v: "5.3 mm" },
         { k: "Weight", v: "444 g (Wi-Fi)" },
@@ -113,13 +118,13 @@ export const IPADS: Product[] = [
     tradeIn: true,
   },
   {
-    slug: "ipad-air-11-m3",
-    name: 'iPad Air 11" M3',
+    slug: "ipad-air-11-m4",
+    name: 'iPad Air 11" M4',
     family: "iPad Air",
     category: "ipad",
     tagline: "Serious power, sensible price. The iPad most people are happiest with.",
     eyebrow: "Most popular",
-    basePrice: 59900,
+    basePrice: 89900,
     art: "tablet",
     colors: [
       { id: "space-grey", name: "Space Grey", hex: "#5b5d61", accent: "#454749", screen: "#101012" },
@@ -129,19 +134,19 @@ export const IPADS: Product[] = [
     ],
     storage: [
       { id: "128gb", label: "128GB", priceDelta: 0 },
-      { id: "256gb", label: "256GB", priceDelta: 10000 },
-      { id: "512gb", label: "512GB", priceDelta: 30000 },
-      { id: "1tb", label: "1TB", priceDelta: 60000 },
+      { id: "256gb", label: "256GB", priceDelta: 12000 },
+      { id: "512gb", label: "512GB", priceDelta: 36000 },
+      { id: "1tb", label: "1TB", priceDelta: 72000 },
     ],
     sizes: {
       title: "Connectivity",
       options: [
         { id: "wifi", label: "Wi-Fi", priceDelta: 0 },
-        { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 15000, note: "5G and eSIM" },
+        { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 18000, note: "5G and eSIM" },
       ],
     },
     highlights: [
-      { title: "M3 chip", copy: "With hardware-accelerated ray tracing — a first for iPad Air." },
+      { title: "M4 chip", copy: "With hardware-accelerated ray tracing, and enough headroom for Apple Intelligence." },
       { title: "Apple Pencil Pro support", copy: "Squeeze, roll and haptics, for drawing and note-taking." },
       { title: "Landscape camera", copy: "The front camera sits on the long edge, where video calls happen." },
       { title: "All-day battery", copy: "Up to 10 hours of web browsing." },
@@ -152,7 +157,7 @@ export const IPADS: Product[] = [
         { k: "Resolution", v: "2360 × 1640 at 264 ppi" },
         { k: "Brightness", v: "500 nits, P3 wide colour, True Tone" },
       ]},
-      { group: "Chip & capacity", rows: [{ k: "Chip", v: "Apple M3" }, { k: "Capacity", v: "128GB to 1TB" }] },
+      { group: "Chip & capacity", rows: [{ k: "Chip", v: "Apple M4" }, { k: "Capacity", v: "128GB to 1TB" }] },
       { group: "Camera", rows: [
         { k: "Rear", v: "12MP Wide, ƒ/1.8" },
         { k: "Front", v: "12MP Ultra Wide landscape camera with Center Stage" },
@@ -168,12 +173,12 @@ export const IPADS: Product[] = [
     tradeIn: true,
   },
   {
-    slug: "ipad-air-13-m3",
-    name: 'iPad Air 13" M3',
+    slug: "ipad-air-13-m4",
+    name: 'iPad Air 13" M4',
     family: "iPad Air",
     category: "ipad",
     tagline: "A big canvas without a Pro price.",
-    basePrice: 79900,
+    basePrice: 119900,
     art: "tablet",
     colors: [
       { id: "space-grey", name: "Space Grey", hex: "#5b5d61", accent: "#454749", screen: "#101012" },
@@ -183,20 +188,20 @@ export const IPADS: Product[] = [
     ],
     storage: [
       { id: "128gb", label: "128GB", priceDelta: 0 },
-      { id: "256gb", label: "256GB", priceDelta: 10000 },
-      { id: "512gb", label: "512GB", priceDelta: 30000 },
-      { id: "1tb", label: "1TB", priceDelta: 60000 },
+      { id: "256gb", label: "256GB", priceDelta: 12000 },
+      { id: "512gb", label: "512GB", priceDelta: 36000 },
+      { id: "1tb", label: "1TB", priceDelta: 72000 },
     ],
     sizes: {
       title: "Connectivity",
       options: [
         { id: "wifi", label: "Wi-Fi", priceDelta: 0 },
-        { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 15000, note: "5G and eSIM" },
+        { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 18000, note: "5G and eSIM" },
       ],
     },
     highlights: [
       { title: "13-inch Liquid Retina", copy: "Room for two apps side by side, and then a Slide Over on top." },
-      { title: "M3 chip", copy: "Handles Procreate, Affinity and Final Cut for iPad without complaint." },
+      { title: "M4 chip", copy: "Handles Procreate, Affinity and Final Cut for iPad without complaint." },
       { title: "Landscape stereo", copy: "Four-speaker audio when you hold it the way you watch." },
       { title: "Magic Keyboard ready", copy: "Turns into a laptop in one magnetic click." },
     ],
@@ -206,7 +211,7 @@ export const IPADS: Product[] = [
         { k: "Resolution", v: "2732 × 2048 at 264 ppi" },
         { k: "Brightness", v: "600 nits" },
       ]},
-      { group: "Chip & capacity", rows: [{ k: "Chip", v: "Apple M3" }, { k: "Capacity", v: "128GB to 1TB" }] },
+      { group: "Chip & capacity", rows: [{ k: "Chip", v: "Apple M4" }, { k: "Capacity", v: "128GB to 1TB" }] },
       { group: "Build", rows: [{ k: "Weight", v: "616 g (Wi-Fi)" }, { k: "Port", v: "USB-C" }] },
     ],
     inBox: ["iPad Air", "USB-C Charge Cable (1 m)", "20W USB-C Power Adapter"],
@@ -223,7 +228,7 @@ export const IPADS: Product[] = [
     family: "iPad",
     category: "ipad",
     tagline: "The iPad for everyone. And now with twice the starting storage.",
-    basePrice: 34900,
+    basePrice: 49900,
     art: "tablet",
     colors: [
       { id: "blue", name: "Blue", hex: "#a8bfd6", accent: "#8aa6c0", screen: "#101012" },
@@ -231,6 +236,9 @@ export const IPADS: Product[] = [
       { id: "yellow", name: "Yellow", hex: "#e6d9a8", accent: "#cfc08c", screen: "#101012" },
       { id: "silver", name: "Silver", hex: "#dfe0e2", accent: "#c0c1c4", screen: "#101012" },
     ],
+    /* Base price confirmed at ₹49,900. The 256GB/512GB steps and the
+       cellular step below were not individually readable off Apple's store
+       — confirm them against your price list. */
     storage: [
       { id: "128gb", label: "128GB", priceDelta: 0 },
       { id: "256gb", label: "256GB", priceDelta: 8000 },
@@ -268,7 +276,7 @@ export const IPADS: Product[] = [
     family: "iPad mini",
     category: "ipad",
     tagline: "Full power. One hand. Goes where a bigger iPad will not.",
-    basePrice: 49900,
+    basePrice: 69900,
     art: "tablet",
     colors: [
       { id: "space-grey", name: "Space Grey", hex: "#5b5d61", accent: "#454749", screen: "#101012" },
@@ -278,13 +286,14 @@ export const IPADS: Product[] = [
     ],
     storage: [
       { id: "128gb", label: "128GB", priceDelta: 0 },
-      { id: "256gb", label: "256GB", priceDelta: 10000 },
-      { id: "512gb", label: "512GB", priceDelta: 30000 },
+      { id: "256gb", label: "256GB", priceDelta: 12000 },
+      { id: "512gb", label: "512GB", priceDelta: 36000 },
     ],
     sizes: {
       title: "Connectivity",
       options: [
         { id: "wifi", label: "Wi-Fi", priceDelta: 0 },
+        /* Cellular step not individually confirmed — check your price list. */
         { id: "cellular", label: "Wi-Fi + Cellular", priceDelta: 15000 },
       ],
     },

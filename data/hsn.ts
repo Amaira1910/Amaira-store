@@ -20,7 +20,7 @@ export const HSN_BY_SLUG: Record<string, HsnEntry> = {
   "apple-tv-4k": { hsn: "85287100", gstRate: 18, description: "Reception apparatus for television" },
   "homepod-2": { hsn: "85182200", gstRate: 18, description: "Multiple loudspeakers, single enclosure" },
   "homepod-mini": { hsn: "85182200", gstRate: 18, description: "Multiple loudspeakers, single enclosure" },
-  "airpods-max": { hsn: "85183000", gstRate: 18, description: "Headphones and earphones" },
+  "airpods-max-2": { hsn: "85183000", gstRate: 18, description: "Headphones and earphones" },
   "magic-keyboard-mac": { hsn: "84716060", gstRate: 18, description: "Input units for ADP machines" },
   "magic-keyboard-ipad-pro": { hsn: "84716060", gstRate: 18, description: "Input units for ADP machines" },
   "magic-mouse": { hsn: "84716060", gstRate: 18, description: "Input units for ADP machines" },

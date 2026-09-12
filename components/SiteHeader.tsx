@@ -180,7 +180,7 @@ export default function SiteHeader({ menu, index }: Props) {
                   <>
                     <p className="search-results-title">Popular right now</p>
                     <ul>
-                      {["iPhone 17 Pro", "MacBook Air", "AirPods Pro 3", "Apple Watch Series 11", "iPad Air"].map((t) => (
+                      {["iPhone Duo", "iPhone 18 Pro", "MacBook Air", "AirPods 5", "Apple Watch Series 12"].map((t) => (
                         <li key={t}>
                           <button type="button" className="search-hit" onClick={() => setQuery(t)}>
                             <span className="search-hit-art"><IconSearch size={16} /></span>

@@ -18,6 +18,7 @@ export type CategorySlug =
 export type ArtKind =
   | "phone"
   | "phone-pro"
+  | "phone-fold"
   | "laptop"
   | "tablet"
   | "watch"
@@ -80,7 +81,7 @@ export type StockState = "in" | "low" | "order";
 export interface Product {
   slug: string;
   name: string;
-  /** Marketing family used for filtering and the local nav, e.g. "iPhone 17 Pro". */
+  /** Marketing family used for filtering and the local nav, e.g. "iPhone 18 Pro". */
   family: string;
   category: CategorySlug;
   tagline: string;

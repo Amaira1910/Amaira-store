@@ -25,6 +25,11 @@ export const TRADE_IN: TradeInFamily[] = [
     id: "iphone",
     label: "iPhone",
     models: [
+      { id: "17-pro-max", label: "iPhone 17 Pro Max", top: 98000 },
+      { id: "17-pro", label: "iPhone 17 Pro", top: 86000 },
+      { id: "17", label: "iPhone 17", top: 56000 },
+      { id: "air", label: "iPhone Air", top: 74000 },
+      { id: "16e", label: "iPhone 16e", top: 32000 },
       { id: "16-pro-max", label: "iPhone 16 Pro Max", top: 82000 },
       { id: "16-pro", label: "iPhone 16 Pro", top: 70000 },
       { id: "16", label: "iPhone 16", top: 46000 },
@@ -43,7 +48,9 @@ export const TRADE_IN: TradeInFamily[] = [
     id: "ipad",
     label: "iPad",
     models: [
+      { id: "ipad-pro-m5", label: "iPad Pro (M5)", top: 92000 },
       { id: "ipad-pro-m4", label: "iPad Pro (M4)", top: 62000 },
+      { id: "ipad-air-m3", label: "iPad Air (M3)", top: 40000 },
       { id: "ipad-pro-m2", label: "iPad Pro (M2)", top: 44000 },
       { id: "ipad-air-m2", label: "iPad Air (M2)", top: 32000 },
       { id: "ipad-10", label: "iPad (10th gen)", top: 18000 },

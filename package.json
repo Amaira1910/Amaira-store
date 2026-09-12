@@ -2,7 +2,7 @@
   "name": "amaira-store",
   "version": "1.0.0",
   "private": true,
-  "description": "Amaira — Apple Premium Reseller, Sanjaynagar, Bangalore. Storefront with Razorpay checkout.",
+  "description": "Amaira \u2014 Apple Premium Reseller, Sanjaynagar, Bangalore. Storefront with Razorpay checkout.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,6 +14,7 @@
     "shots": "node scripts/screenshot.mjs",
     "mock:razorpay": "node scripts/mock-razorpay.mjs",
     "db:seed": "tsx scripts/seed.ts",
+    "db:reprice": "tsx scripts/reprice.ts",
     "db:admin": "tsx scripts/create-admin.ts",
     "db:stock": "tsx scripts/receive-stock.ts"
   },

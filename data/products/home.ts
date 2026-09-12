@@ -1,14 +1,15 @@
-/* TV & Home — ⚠️ VERIFY prices before go-live. */
+/* TV & Home — reconciled against apple.com/in on 12 September 2026.
+   Prices are Apple India retail MRP, inclusive of all taxes. */
 import type { Product } from "@/lib/types";
 
 export const HOME: Product[] = [
   {
     slug: "homepod-2",
-    name: "HomePod (2nd generation)",
+    name: "HomePod",
     family: "HomePod",
     category: "tv-home",
     tagline: "Room-filling sound that knows the shape of your room.",
-    basePrice: 32900,
+    basePrice: 44900,
     art: "speaker",
     colors: [
       { id: "midnight", name: "Midnight", hex: "#2f3036", accent: "#1f2025", screen: "#2f3036" },
@@ -47,7 +48,7 @@ export const HOME: Product[] = [
     family: "HomePod mini",
     category: "tv-home",
     tagline: "Big sound, small footprint, five colours.",
-    basePrice: 11900,
+    basePrice: 15900,
     art: "speaker-mini",
     colors: [
       { id: "midnight", name: "Midnight", hex: "#33343a", accent: "#232429", screen: "#33343a" },
@@ -87,13 +88,13 @@ export const HOME: Product[] = [
     family: "Apple TV",
     category: "tv-home",
     tagline: "The fastest way to make any TV feel new again.",
-    basePrice: 14900,
+    basePrice: 25900,
     art: "tv-box",
     colors: [{ id: "black", name: "Black", hex: "#2b2b2f", accent: "#1c1c1f", screen: "#2b2b2f" }],
     storageTitle: "Model",
     storage: [
       { id: "64gb", label: "64GB · Wi-Fi", priceDelta: 0 },
-      { id: "128gb", label: "128GB · Wi-Fi + Ethernet", priceDelta: 4000, note: "Adds Gigabit Ethernet and Thread" },
+      { id: "128gb", label: "128GB · Wi-Fi + Ethernet", priceDelta: 6000, note: "Adds Gigabit Ethernet and Thread" },
     ],
     highlights: [
       { title: "A15 Bionic", copy: "Instant, fluid, and ready for Apple Arcade." },

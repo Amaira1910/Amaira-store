@@ -1,29 +1,38 @@
-/* Apple Watch — ⚠️ VERIFY prices and case sizes before go-live. */
+/* Apple Watch — reconciled against apple.com/in on 12 September 2026.
+   Current line-up: Series 12, Ultra 4, SE 3. Series 11 and Ultra 3 were
+   superseded on 9 Sept 2026 and are no longer sold new.
+   Prices are Apple India retail MRP (inclusive of all taxes).
+   ⚠️ The Cellular upgrade deltas below are derived, not read off a per-SKU
+   page — check them against your APR price list before go-live. */
 import type { Product } from "@/lib/types";
-import { WATCH_ALUMINIUM } from "../palettes";
+import { WATCH_ALUMINIUM_12 } from "../palettes";
 
 export const WATCHES: Product[] = [
   {
-    slug: "apple-watch-series-11",
-    name: "Apple Watch Series 11",
+    slug: "apple-watch-series-12",
+    name: "Apple Watch Series 12",
     family: "Apple Watch Series",
     category: "watch",
-    tagline: "Now with hypertension notifications and a sleep score.",
+    tagline: "A new health sensing system, with hypertension notifications and a sleep score.",
     eyebrow: "New",
-    basePrice: 46900,
+    basePrice: 56900,
     art: "watch",
-    colors: WATCH_ALUMINIUM,
+    /* Aluminium finishes only. Apple also sells Series 12 in titanium and
+       ceramic at materially higher prices (ceramic from ₹1,24,900); this
+       schema prices one axis, so stock those as separate products if Amaira
+       carries them. */
+    colors: WATCH_ALUMINIUM_12,
     sizes: {
       title: "Case size",
       options: [
         { id: "42mm", label: "42 mm", priceDelta: 0, note: "Fits 130–200 mm wrists" },
-        { id: "46mm", label: "46 mm", priceDelta: 3000, note: "Fits 140–220 mm wrists" },
+        { id: "46mm", label: "46 mm", priceDelta: 6000, note: "Fits 140–220 mm wrists" },
       ],
     },
     storageTitle: "Connectivity",
     storage: [
       { id: "gps", label: "GPS", priceDelta: 0, note: "Pairs with your iPhone" },
-      { id: "cellular", label: "GPS + Cellular", priceDelta: 10000, note: "Calls and data without your phone" },
+      { id: "cellular", label: "GPS + Cellular", priceDelta: 13000, note: "Calls and data without your phone" },
     ],
     highlights: [
       { title: "Hypertension notifications", copy: "Watch can notify you of consistent signs of high blood pressure over 30 days." },
@@ -50,22 +59,22 @@ export const WATCHES: Product[] = [
         { k: "Case", v: "100% recycled aluminium" },
       ]},
     ],
-    inBox: ["Apple Watch Series 11", "Band (size of your choice)", "Magnetic Fast Charger to USB-C Cable"],
+    inBox: ["Apple Watch Series 12", "Band (size of your choice)", "Magnetic Fast Charger to USB-C Cable"],
     stock: "in",
     rank: 91,
     tags: ["fitness", "health", "new", "everyday"],
     leadTimeDays: 1,
-    careAnnual: 5900,
+    careAnnual: 6900,
     tradeIn: true,
   },
   {
-    slug: "apple-watch-ultra-3",
-    name: "Apple Watch Ultra 3",
+    slug: "apple-watch-ultra-4",
+    name: "Apple Watch Ultra 4",
     family: "Apple Watch Ultra",
     category: "watch",
-    tagline: "Satellite messaging, the biggest display, and 42 hours of battery.",
+    tagline: "Satellite messaging, the biggest display, and the longest battery life of any Apple Watch.",
     eyebrow: "New",
-    basePrice: 89900,
+    basePrice: 109900,
     art: "watch-rugged",
     colors: [
       { id: "natural", name: "Natural Titanium", hex: "#c9c3ba", accent: "#3a3a3c", screen: "#08080a" },
@@ -76,7 +85,7 @@ export const WATCHES: Product[] = [
     storage: [{ id: "cellular", label: "GPS + Cellular", priceDelta: 0, note: "Included on every Ultra" }],
     highlights: [
       { title: "Satellite messaging", copy: "Send a message when you are far outside cellular coverage." },
-      { title: "42-hour battery", copy: "Up to 72 hours in Low Power Mode. Plan a whole weekend around it." },
+      { title: "Multi-day battery", copy: "Enough for a whole weekend, and longer again in Low Power Mode." },
       { title: "Brightest, biggest display", copy: "3000 nits, wide-angle OLED, readable in direct sun." },
       { title: "Built for depth and altitude", copy: "100 m water resistance, EN13319 dive certification, and a depth gauge." },
     ],
@@ -99,12 +108,12 @@ export const WATCHES: Product[] = [
         { k: "Extras", v: "86 dB siren, Action button, depth gauge, water temperature sensor" },
       ]},
     ],
-    inBox: ["Apple Watch Ultra 3", "Band (size of your choice)", "Magnetic Fast Charger to USB-C Cable"],
+    inBox: ["Apple Watch Ultra 4", "Band (size of your choice)", "Magnetic Fast Charger to USB-C Cable"],
     stock: "low",
     rank: 83,
     tags: ["adventure", "diving", "titanium", "battery", "satellite"],
     leadTimeDays: 4,
-    careAnnual: 9900,
+    careAnnual: 11900,
     tradeIn: true,
   },
   {
@@ -113,7 +122,7 @@ export const WATCHES: Product[] = [
     family: "Apple Watch SE",
     category: "watch",
     tagline: "The essentials done properly, at the friendliest price.",
-    basePrice: 24900,
+    basePrice: 29900,
     art: "watch",
     colors: [
       { id: "midnight", name: "Midnight", hex: "#2f343c", accent: "#454b55", screen: "#08080a" },
@@ -123,7 +132,7 @@ export const WATCHES: Product[] = [
       title: "Case size",
       options: [
         { id: "40mm", label: "40 mm", priceDelta: 0 },
-        { id: "44mm", label: "44 mm", priceDelta: 3000 },
+        { id: "44mm", label: "44 mm", priceDelta: 4000 },
       ],
     },
     storageTitle: "Connectivity",

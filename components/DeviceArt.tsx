@@ -158,6 +158,39 @@ export default function DeviceArt({ kind, hex, accent, screen, label, className 
     );
   }
 
+  /* ----------------------------------------------------------- phone-fold */
+  /* iPhone Duo. Drawn unfolded, because that is the 7.6-inch face people are
+     buying — the hinge crease down the centre and the narrow cover-display
+     sliver on the right are what tell you it folds. */
+  if (kind === "phone-fold") {
+    return (
+      <svg {...common}>
+        {defs}
+        <ellipse cx="160" cy="292" rx="112" ry="12" fill={shadowFill} />
+        {/* unfolded body: wider than it is tall once opened */}
+        <rect x="52" y="46" width="216" height="232" rx="17" fill={body} stroke={edge} strokeWidth="1.2" />
+        <rect x="52" y="46" width="216" height="232" rx="17" fill="none" stroke={rail} strokeWidth="2.2" />
+        {/* inner display */}
+        <rect x="62" y="56" width="196" height="212" rx="9" fill={screenFill} />
+        <rect x="62" y="56" width="196" height="212" rx="9" fill={glass} />
+        {/* hinge crease — a soft highlight, not a hard seam */}
+        <rect x="158.4" y="56" width="3.2" height="212" fill={shade(s, 0.22)} opacity="0.5" />
+        <rect x="159.6" y="56" width="0.8" height="212" fill={shade(s, 0.45)} opacity="0.35" />
+        {/* under-display front camera on the right panel */}
+        <circle cx="212" cy="66" r="2.4" fill={shade(s, 0.3)} />
+        {/* hinge spine down the outside edge of the chassis */}
+        <rect x="156" y="44" width="8" height="4" rx="2" fill={accentFill} opacity="0.8" />
+        <rect x="156" y="276" width="8" height="4" rx="2" fill={accentFill} opacity="0.8" />
+        {/* dual 48MP rear plateau, visible on the left panel's back edge */}
+        <rect x="64" y="36" width="44" height="14" rx="7" fill={accentFill} stroke={edge} strokeWidth="0.8" />
+        <circle cx="76" cy="43" r="4.6" fill={lens} stroke={edge} strokeWidth="1" />
+        <circle cx="96" cy="43" r="4.6" fill={lens} stroke={edge} strokeWidth="1" />
+        {/* side button on the right rail */}
+        <rect x="267.2" y="128" width="2.2" height="34" rx="1.1" fill={edge} opacity="0.55" />
+      </svg>
+    );
+  }
+
   /* --------------------------------------------------------------- laptop */
   if (kind === "laptop") {
     return (
