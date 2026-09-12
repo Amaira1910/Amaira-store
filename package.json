@@ -1,0 +1,46 @@
+{
+  "name": "amaira-store",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Amaira \u2014 Apple Premium Reseller, Sanjaynagar, Bangalore. Storefront with Razorpay checkout.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "icons": "node scripts/make-icons.mjs",
+    "linkcheck": "node scripts/linkcheck.mjs",
+    "shots": "node scripts/screenshot.mjs",
+    "mock:razorpay": "node scripts/mock-razorpay.mjs",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:reprice": "tsx scripts/reprice.ts",
+    "db:admin": "tsx scripts/create-admin.ts",
+    "db:stock": "tsx scripts/receive-stock.ts"
+  },
+  "dependencies": {
+    "@capacitor-mlkit/barcode-scanning": "^8.2.1",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.5.2",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/push-notifications": "^8.1.2",
+    "@capacitor/share": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.3",
+    "better-sqlite3": "^13.0.3",
+    "next": "15.5.25",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "22.10.5",
+    "@types/react": "19.0.7",
+    "@types/react-dom": "19.0.3",
+    "playwright": "^1.63.0",
+    "tsx": "^4.23.13",
+    "typescript": "5.7.3"
+  }
+}

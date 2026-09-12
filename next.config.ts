@@ -1,0 +1,32 @@
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  poweredByHeader: false,
+  // better-sqlite3 is a native module: it must stay outside the bundle.
+  serverExternalPackages: ["better-sqlite3"],
+  // Produces .next/standalone with only the files the server needs — the
+  // container image drops from ~1GB to ~200MB.
+  output: "standalone",
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(self)",
+          },
+        ],
+      },
+    ];
+  },
+};
+
+export default nextConfig;

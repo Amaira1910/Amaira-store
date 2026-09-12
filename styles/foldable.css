@@ -1,0 +1,127 @@
+/* ==========================================================================
+   Foldable and dual-screen devices.
+
+   A book-style foldable is not simply "a wider phone". It has a physical
+   hinge, and content that straddles it is split by a seam or a dead zone. The
+   CSS Viewport Segments spec gives us both the count of segments and their
+   exact geometry, so we can align our own columns to the real screens instead
+   of guessing at a breakpoint.
+
+     horizontal-viewport-segments: 2   two screens side by side (hinge vertical)
+     vertical-viewport-segments: 2     two screens stacked    (hinge horizontal)
+
+   env(viewport-segment-*) gives per-segment edges. The gap between segment 0's
+   right edge and segment 1's left edge IS the hinge, so using it as the grid
+   gutter puts the seam in the gutter where nothing is drawn.
+
+   Everything here is additive. A device with one segment, or a browser without
+   the feature, never matches these queries and keeps the standard layout.
+   ========================================================================== */
+
+/* --- Book posture: two screens left and right ---------------------------- */
+@media (horizontal-viewport-segments: 2) {
+  :root {
+    /* The hinge, as a usable length. */
+    --hinge-w: calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0));
+    --seg-0-w: env(viewport-segment-width 0 0);
+    --seg-1-w: env(viewport-segment-width 1 0);
+  }
+
+  /* Chrome spans both screens; keep its content clear of the seam. */
+  .nav-inner,
+  .localnav-inner,
+  .footer-inner,
+  .mega-inner,
+  .search-inner {
+    max-width: none;
+  }
+
+  /* These layouts align their columns to the PHYSICAL screens, so their
+     container has to span the whole viewport. Inside .page it would otherwise
+     sit within a 32px gutter, making each track narrower than its screen and
+     spilling the difference behind the page padding. A negative inline margin
+     cancels the ancestor gutter; the children carry their own padding back. */
+  .pdp,
+  .bag-layout,
+  .checkout-layout,
+  .store-grid,
+  .feature-grid {
+    margin-inline: calc(var(--gutter) * -1);
+    grid-template-columns: var(--seg-0-w) var(--seg-1-w);
+    column-gap: var(--hinge-w);
+    padding-inline: 0;
+  }
+  .pdp > *,
+  .bag-layout > *,
+  .checkout-layout > *,
+  .store-grid > * {
+    padding-inline: var(--gutter);
+    min-width: 0;
+  }
+
+  /* Gallery on the left screen, buy box on the right — no sticky offset
+     needed once each half is its own screen. */
+  .gallery { position: static; }
+  .summary { position: static; }
+
+  /* A listing keeps its filter rail collapsed at this width, so the products
+     get both screens: a two-up grid with the hinge as its gutter, which means
+     no tile is ever split by the seam. */
+  .listing { grid-template-columns: 1fr; }
+  .listing .grid-3 {
+    margin-inline: calc(var(--gutter) * -1);
+    grid-template-columns: var(--seg-0-w) var(--seg-1-w);
+    column-gap: var(--hinge-w);
+  }
+  .listing .grid-3 > * { margin-inline: var(--gutter); }
+
+  /* Never centre a headline across the hinge — it would read as two halves. */
+  .hero-content { max-width: var(--seg-0-w); margin-inline: auto; }
+
+  .feature-span { grid-column: 1 / -1; }
+
+  /* The admin portal gets the sidebar on one screen, work on the other. */
+  .adm { grid-template-columns: var(--seg-0-w) var(--seg-1-w); column-gap: var(--hinge-w); }
+}
+
+/* --- Laptop posture: two screens stacked --------------------------------- */
+@media (vertical-viewport-segments: 2) {
+  :root {
+    --hinge-h: calc(env(viewport-segment-top 0 1) - env(viewport-segment-bottom 0 0));
+    --seg-top-h: env(viewport-segment-height 0 0);
+  }
+
+  /* Put the image on the upper screen and everything tappable on the lower
+     one, so the hand never crosses the hinge to act. */
+  .pdp,
+  .bag-layout,
+  .checkout-layout { grid-template-columns: 1fr; row-gap: var(--hinge-h); }
+
+  .gallery-stage { max-height: calc(var(--seg-top-h) - 120px); }
+
+  /* A hero that fills only the top screen reads as intended rather than
+     being cut in half by the fold. */
+  .hero { min-height: var(--seg-top-h); }
+
+  /* The sticky buy bar belongs on the bottom screen, within thumb reach. */
+  .buybox-sticky { position: sticky; bottom: 0; }
+}
+
+/* --- Folded: a single tall, narrow screen -------------------------------- */
+/* Some foldables are unusually narrow when shut. Guard the layout so nothing
+   overflows at ~320px, without changing anything on ordinary phones. */
+@media (max-width: 360px) {
+  :root { --gutter: 16px; }
+  .grid-3, .grid-4, .listing .grid-3 { grid-template-columns: 1fr; }
+  .hero-title { font-size: clamp(2rem, 9vw, 2.75rem); }
+  .adm-table { font-size: var(--t-micro); }
+  .nav-brand .wordmark { font-size: 17px; }
+}
+
+/* --- Very wide desktop --------------------------------------------------- */
+/* A 27-inch Studio Display should not stretch a 1180px column to 2000px, but
+   it can afford a denser product grid. */
+@media (min-width: 1600px) {
+  .grid-3 { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  .adm-main { max-width: 1480px; }
+}

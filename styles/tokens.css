@@ -1,0 +1,110 @@
+/* ==========================================================================
+   Amaira — design tokens
+   A single source of truth for colour, type, spacing, radius and motion.
+   The palette follows Apple's retail surface language: near-black text on
+   paper-white and mist-grey grounds, one saturated blue for action, and
+   nothing else competing for attention.
+   ========================================================================== */
+
+:root {
+  /* --- Ink & ground ----------------------------------------------------- */
+  --ink: #1d1d1f;              /* primary text */
+  --ink-2: #6e6e73;            /* secondary text, captions */
+  --ink-3: #86868b;            /* tertiary, disabled */
+  --ground: #ffffff;           /* paper */
+  --ground-2: #f5f5f7;         /* mist — section alternation */
+  --ground-3: #fafafc;         /* barely-there */
+  --ground-inverse: #000000;   /* full-bleed dark sections */
+  --hairline: #d2d2d7;         /* 1px rules and input borders */
+  --hairline-soft: #e8e8ed;
+
+  /* --- Action ----------------------------------------------------------- */
+  --blue: #0071e3;
+  --blue-hover: #0077ed;
+  --blue-active: #006edb;
+  --link: #0066cc;
+  --focus: #0071e3;
+
+  /* --- Signal ----------------------------------------------------------- */
+  --amber: #bf4800;            /* availability / offers, Apple's orange-brown */
+  --green: #008009;            /* in stock, success */
+  --red: #b3261e;              /* errors */
+  --gold: #a97142;
+
+  /* --- Elevation -------------------------------------------------------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.05), 0 12px 28px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.10);
+  --shadow-nav: 0 1px 0 rgba(0, 0, 0, 0.06);
+
+  /* --- Radius ----------------------------------------------------------- */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-2xl: 32px;
+  --r-pill: 980px;
+
+  /* --- Type ------------------------------------------------------------- */
+  /* Real SF on Apple hardware; Inter is the closest freely-licensed stand-in
+     everywhere else. Both are optically similar at display sizes. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* Apple tightens tracking as type grows. These pairs keep that relationship. */
+  --t-hero: clamp(2.75rem, 1.2rem + 6.2vw, 5.5rem);
+  --t-hero-ls: -0.022em;
+  --t-display: clamp(2.25rem, 1.1rem + 4.4vw, 3.75rem);
+  --t-display-ls: -0.019em;
+  --t-title: clamp(1.75rem, 1rem + 2.6vw, 2.75rem);
+  --t-title-ls: -0.017em;
+  --t-headline: clamp(1.3125rem, 0.95rem + 1.1vw, 1.75rem);
+  --t-headline-ls: -0.012em;
+  --t-body-lg: 1.1875rem;   /* 19px — intro paragraphs */
+  --t-body: 1.0625rem;      /* 17px — Apple's body size */
+  --t-body-sm: 0.9375rem;   /* 15px */
+  --t-caption: 0.8125rem;   /* 13px */
+  --t-micro: 0.75rem;       /* 12px — nav, legal */
+
+  /* --- Spacing ---------------------------------------------------------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 88px;
+  --s-10: 120px;
+
+  /* --- Structure -------------------------------------------------------- */
+  --page-max: 1180px;        /* Apple's content column */
+  --page-wide: 1440px;
+  --gutter: 22px;
+  --nav-h: 48px;
+  --banner-h: 0px;
+
+  /* --- Motion ----------------------------------------------------------- */
+  /* Apple's easing is asymmetric: quick to leave, slow to settle. */
+  --ease: cubic-bezier(0.4, 0, 0.22, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.44, 1);
+  --dur-fast: 140ms;
+  --dur: 260ms;
+  --dur-slow: 520ms;
+
+  --z-nav: 9000;
+  --z-menu: 8900;
+  --z-modal: 9500;
+  --z-toast: 9600;
+}
+
+@media (min-width: 735px) {
+  :root { --gutter: 32px; }
+}
+@media (min-width: 1069px) {
+  :root { --gutter: 40px; --nav-h: 52px; }
+}
